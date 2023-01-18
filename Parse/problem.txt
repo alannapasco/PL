@@ -1,0 +1,25 @@
+
+Write a program that accepts any JSON and determines whether it
+belongs to the following subset of JSON data:
+
+  Boolean JSON (BJSON) is one of:
+   -- true
+   -- false
+   -- [BJSON, "^", BJSON]
+   -- [BJSON, "&&", BJSON]
+
+Call the function `parse`. Its result is an abstract syntax tree (of
+your own design) that optionally contains a node where the given JSON
+tree deviates from the desired format.
+
+
+OPTIONALLY:
+
+Adjust the main function to accept arbitrary JSON input j
+and 
+    -- returns a Boolean if j is a Boolean JSON
+    -- signals an error if j is not a Boolean JSON
+       (as informative as you desire)
+
+
+

@@ -1,0 +1,11 @@
+
+Write a program that determines the natural meaning of the following
+form of JSON inputs: 
+
+  Boolean JSON (BJSON) is one of:
+   -- true
+   -- false
+   -- [BJSON, "^", BJSON]
+   -- [BJSON, "&&", BJSON]
+
+Call the function `value`. Its result is a Boolean. 
