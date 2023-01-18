@@ -14,13 +14,13 @@
 (require typed/rackunit)
 
 ;; -----------------------------------------------------------------------------
-(: test (->* [ (-> Any) JSExpr Boolean String ] [(-> Any Boolean)] Any))
-(define (test main in exp msg [handle? (λ _ #false)])
+(: test (->* [ (-> Any) JSExpr Any String ] [(-> Any Boolean)] Any))
+(define (test main in expected msg [handle? (λ _ #false)])
   (with-handlers ([handle? void])
     (define-values [record-in record-out] (make-record))
     (define in-json (jsexpr->string (record-in in)))
     (define actual  (record-out (string->jsexpr (redirect main in-json))))
-    (check-equal? actual exp msg)))
+    (check-equal? actual expected msg)))
 
 (: make-record (-> (Values (JSExpr -> JSExpr) (JSExpr -> JSExpr))))
 ;; make two recording functions, one for input and one for output (*counter)
