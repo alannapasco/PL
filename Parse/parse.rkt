@@ -51,7 +51,7 @@ exec racket -tm "$0" -- ${1+"$@"}
 ;; -----------------------------------------------------------------------------
 ;; determine the standard meaning of b
 
-(: value (-> AST Boolean))
+(: value (-> AST Meaning))
 (define (value b)
   (match b
     [`(&& ,left  ,right) (and (value left) (value right))]
