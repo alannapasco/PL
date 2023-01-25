@@ -57,61 +57,56 @@ public class Main {
                 JsonElement secondVal = astList.get(2);
                 switch (op) {
                     case "^":
-                        try {
-                            TypePrediction tpFirst = parse(firstVal).typeCheck();
-                            TypePrediction tpSecond = parse(secondVal).typeCheck();
-                            if (tpFirst==TypePrediction.BOOLEAN && tpSecond==TypePrediction.BOOLEAN) {
-                                return new ASTAnd(parse(firstVal), parse(secondVal));
-                            }
-                        } catch (Exception e) {
-                            return new ASTError("Invalid Expression: " + element + " ");
+                        if (booleanOperands(firstVal, secondVal)) {
+                            return new ASTAnd(parse(firstVal), parse(secondVal));
                         }
+                        return new ASTError("Invalid Expression: " + element + " ");
                     case "||":
-                        try {
-                            TypePrediction tpFirst = parse(firstVal).typeCheck();
-                            TypePrediction tpSecond = parse(secondVal).typeCheck();
-                            if (tpFirst==TypePrediction.BOOLEAN && tpSecond==TypePrediction.BOOLEAN) {
-                                return new ASTOr(parse(firstVal), parse(secondVal));
-                            }
-                        } catch (Exception e) {
-                            return new ASTError("Invalid Expression: " + element + " ");
+                        if (booleanOperands(firstVal, secondVal)) {
+                            return new ASTOr(parse(firstVal), parse(secondVal));
                         }
+                        return new ASTError("Invalid Expression: " + element + " ");
                     case ">":
-                        try {
-                            TypePrediction tpFirst = parse(firstVal).typeCheck();
-                            TypePrediction tpSecond = parse(secondVal).typeCheck();
-                            if (tpFirst==TypePrediction.INTEGER && tpSecond==TypePrediction.INTEGER) {
-                                return new ASTGreaterThan(parse(firstVal), parse(secondVal));
-                            }
-                        } catch (Exception e) {
-                            return new ASTError("Invalid Expression: " + element + " ");
+                        if (integerOperands(firstVal, secondVal)) {
+                            return new ASTGreaterThan(parse(firstVal), parse(secondVal));
                         }
+                        return new ASTError("Invalid Expression: " + element + " ");
                     case "-":
-                        try {
-                            TypePrediction tpFirst = parse(firstVal).typeCheck();
-                            TypePrediction tpSecond = parse(secondVal).typeCheck();
-                            if (tpFirst==TypePrediction.INTEGER && tpSecond==TypePrediction.INTEGER) {
-                                return new ASTSub(parse(firstVal), parse(secondVal));
-                            }
-                        } catch (Exception e) {
-                            return new ASTError("Invalid Expression: " + element + " ");
+                        if (integerOperands(firstVal, secondVal)) {
+                            return new ASTSub(parse(firstVal), parse(secondVal));
                         }
+                        return new ASTError("Invalid Expression: " + element + " ");
                     case "+":
-                        try {
-                            TypePrediction tpFirst = parse(firstVal).typeCheck();
-                            TypePrediction tpSecond = parse(secondVal).typeCheck();
-                            if (tpFirst==TypePrediction.INTEGER && tpSecond==TypePrediction.INTEGER) {
-                                return new ASTAdd(parse(firstVal), parse(secondVal));
-                            }
-                        } catch (Exception e) {
-                            return new ASTError("Invalid Expression: " + element + " ");
+                        if (integerOperands(firstVal, secondVal)) {
+                            return new ASTAdd(parse(firstVal), parse(secondVal));
                         }
+                        return new ASTError("Invalid Expression: " + element + " ");
                     default:
                         return new ASTError("Invalid Operator: " + element + " ");
                 }
             }
         }
         return new ASTError("Not Valid AST: " + element + " ");
+    }
+
+    private static boolean booleanOperands(JsonElement firstVal, JsonElement secondVal){
+        try {
+            TypePrediction tpFirst = parse(firstVal).typeCheck();
+            TypePrediction tpSecond = parse(secondVal).typeCheck();
+            return tpFirst==TypePrediction.BOOLEAN && tpSecond==TypePrediction.BOOLEAN;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static boolean integerOperands(JsonElement firstVal, JsonElement secondVal){
+        try {
+            TypePrediction tpFirst = parse(firstVal).typeCheck();
+            TypePrediction tpSecond = parse(secondVal).typeCheck();
+            return tpFirst==TypePrediction.INTEGER && tpSecond==TypePrediction.INTEGER;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private static boolean validOperator(JsonElement operator){
