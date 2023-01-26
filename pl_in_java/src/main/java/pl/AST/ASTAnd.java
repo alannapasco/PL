@@ -24,15 +24,15 @@ public class ASTAnd implements AST {
     }
 
     @Override
-    public IMeaning value() {
+    public IMeaning value() throws Exception {
         if (this.firstVal.value() instanceof BooleanRepresentation
                 && this.secondVal.value() instanceof BooleanRepresentation) {
             BooleanRepresentation firstValBool = (BooleanRepresentation) this.firstVal.value();
             BooleanRepresentation secondValBool = (BooleanRepresentation) this.secondVal.value();
             return new BooleanRepresentation(firstValBool.value && secondValBool.value);
+        } else {
+            throw new Exception("Invalid " + this.getClass().toString());
         }
-        //TODO ??
-        return null;
     }
 
     @Override

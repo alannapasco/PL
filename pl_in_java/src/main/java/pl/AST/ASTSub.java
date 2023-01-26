@@ -24,13 +24,13 @@ public class ASTSub implements AST {
     }
 
     @Override
-    public IMeaning value() {
+    public IMeaning value() throws Exception {
         if (this.firstVal.value() instanceof IntegerRepresentation firstValInt
                 && this.secondVal.value() instanceof IntegerRepresentation secondValInt) {
             return new IntegerRepresentation(firstValInt.value - secondValInt.value);
+        }else {
+            throw new Exception("Invalid " + this.getClass().toString());
         }
-        //TODO ??
-        return null;
     }
 
     @Override

@@ -39,6 +39,6 @@ public interface AST {
     /**
      * Determines the value of the AST expression
      */
-    IMeaning value();
+    IMeaning value() throws Exception;
 
 }

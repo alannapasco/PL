@@ -39,16 +39,7 @@ public class Main {
 
     public static AST parse(JsonElement element) {
         if (element.isJsonPrimitive()) {
-            try {
-                int i = element.getAsInt();
-                return new ASTInteger(i);
-            } catch (NumberFormatException e) {
-                //here we could either have a string or boolean
-            }
-            if (element.getAsBoolean() || (!element.getAsBoolean() && element.getAsString().equals("false"))) {
-                return new ASTBoolean(element.getAsBoolean());
-            }
-            new ASTError("Invalid Primitive: " + element + " ");
+            return Main.parsePrimitive(element.getAsJsonPrimitive());
         } else if (element.isJsonArray()) {
             JsonArray astList = element.getAsJsonArray();
             if (astList.size()==3) {
@@ -57,30 +48,15 @@ public class Main {
                 JsonElement secondVal = astList.get(2);
                 switch (op) {
                     case "^":
-                        if (booleanOperands(firstVal, secondVal)) {
-                            return new ASTAnd(parse(firstVal), parse(secondVal));
-                        }
-                        return new ASTError("Invalid Expression: " + element + " ");
+                        return new ASTAnd(parse(firstVal), parse(secondVal));
                     case "||":
-                        if (booleanOperands(firstVal, secondVal)) {
-                            return new ASTOr(parse(firstVal), parse(secondVal));
-                        }
-                        return new ASTError("Invalid Expression: " + element + " ");
+                        return new ASTOr(parse(firstVal), parse(secondVal));
                     case ">":
-                        if (integerOperands(firstVal, secondVal)) {
-                            return new ASTGreaterThan(parse(firstVal), parse(secondVal));
-                        }
-                        return new ASTError("Invalid Expression: " + element + " ");
+                        return new ASTGreaterThan(parse(firstVal), parse(secondVal));
                     case "-":
-                        if (integerOperands(firstVal, secondVal)) {
-                            return new ASTSub(parse(firstVal), parse(secondVal));
-                        }
-                        return new ASTError("Invalid Expression: " + element + " ");
+                        return new ASTSub(parse(firstVal), parse(secondVal));
                     case "+":
-                        if (integerOperands(firstVal, secondVal)) {
-                            return new ASTAdd(parse(firstVal), parse(secondVal));
-                        }
-                        return new ASTError("Invalid Expression: " + element + " ");
+                        return new ASTAdd(parse(firstVal), parse(secondVal));
                     default:
                         return new ASTError("Invalid Operator: " + element + " ");
                 }
@@ -89,28 +65,16 @@ public class Main {
         return new ASTError("Not Valid AST: " + element + " ");
     }
 
-    private static boolean booleanOperands(JsonElement firstVal, JsonElement secondVal){
+    private static AST parsePrimitive(JsonPrimitive element) {
         try {
-            TypePrediction tpFirst = parse(firstVal).typeCheck();
-            TypePrediction tpSecond = parse(secondVal).typeCheck();
-            return tpFirst==TypePrediction.BOOLEAN && tpSecond==TypePrediction.BOOLEAN;
-        } catch (Exception e) {
-            return false;
+            int i = element.getAsInt();
+            return new ASTInteger(i);
+        } catch (NumberFormatException e) {
+            //here we could either have a string or boolean
+            if (element.getAsBoolean() || (!element.getAsBoolean() && element.getAsString().equals("false"))) {
+                return new ASTBoolean(element.getAsBoolean());
+            }
         }
-    }
-
-    private static boolean integerOperands(JsonElement firstVal, JsonElement secondVal){
-        try {
-            TypePrediction tpFirst = parse(firstVal).typeCheck();
-            TypePrediction tpSecond = parse(secondVal).typeCheck();
-            return tpFirst==TypePrediction.INTEGER && tpSecond==TypePrediction.INTEGER;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private static boolean validOperator(JsonElement operator){
-        String op = operator.getAsString();
-        return op.equals("^") || op.equals("||") || op.equals(">") || op.equals("-") || op.equals("+");
+        return new ASTError("Invalid Primitive: " + element + " ");
     }
 }

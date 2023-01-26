@@ -16,12 +16,12 @@ public class ASTError implements AST {
     }
 
     @Override
-    public IMeaning value() {
-      return new Exeception("can't happen" + message);
+    public IMeaning value() throws Exception {
+        throw new Exception("Error: " + this.message);
     }
 
     @Override
     public String toString(){
-        return this.message;
+        return "ASTERROR " + this.message;
     }
 }
