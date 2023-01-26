@@ -5,18 +5,18 @@ Parsing Problem 2, Extended Grammar
 1.Write a program that accepts any JSON and determines whether it
 belongs to the following subset of JSON data:
 
-  Boolean JSON (BJSON) is one of:
+  Mixed JSON (MJSON) is one of:
    -- true
    -- false
-   -- [BJSON, "^",  BJSON]
-   -- [BJSON, "&&", BJSON]
+   -- [MJSON, "^",  MJSON]
+   -- [MJSON, "&&", MJSON]
 
    ;; new expressions: 
 
-   -- [BJSON, ">",  BJSON]
+   -- [MJSON, ">",  MJSON]
    -- Integer (small ones)
-   -- [BJSON, "-",  BJSON]
-   -- [BJSON, "+",  BJSON]
+   -- [MJSON, "-",  MJSON]
+   -- [MJSON, "+",  MJSON]
    
 
 Call the function `parse`. Its result is an abstract syntax tree (of
