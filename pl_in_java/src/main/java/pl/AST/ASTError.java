@@ -17,7 +17,7 @@ public class ASTError implements AST {
 
     @Override
     public IMeaning value() {
-        return null;
+      return new Exeception("can't happen" + message);
     }
 
     @Override
