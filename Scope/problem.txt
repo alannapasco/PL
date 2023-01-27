@@ -1,0 +1,57 @@
+
+Scope Problem
+
+Here is a JSON grammar that adds variable declarations to the language: 
+
+  Var JSON (VJSON) is one of:
+   -- true
+   -- false
+   -- [VJSON, "^",  VJSON]
+   -- [VJSON, "&&", VJSON]
+   -- [VJSON, ">",  VJSON]
+   -- Integer (small ones)
+   -- [VJSON, "-",  VJSON]
+   -- [VJSON, "+",  VJSON]
+
+   ;; new expressions:
+
+   -- ["let", Type, Name, "=", VJSON, "in", VJSON]  -- variable declaration 
+   -- Name                                          -- variable occurrence 
+
+   Type is one of:
+   -- "int"
+   -- "bool" 
+
+   Name is a (simple) String (no JSON tricks).
+
+PROGRAMMING TASKS:
+
+1. Revise the parser to accept VJSON. 
+2. Revise the type checker to check the suitably extended AST. 
+3. Revise the `value` function to consume dBast instead of AST. 
+
+THINKING TASKS:
+
+Here are the first "think about the developer" tasks:
+
+4. Java comes with _static_ overloading. See
+   "teaching-hint.rkt" for how one could think about this in
+   the context of this exercise. If you open the file in
+   DrRacket, one of the expression fails to type check
+   because Typed Racket does _not_ come with static
+   overloading.
+
+   What's good/bad for a sw dev about (not) including static
+   overloading? Make an example in Java to remind yourself
+   how it works.
+   
+5. Python does not distinguish between variable declarations
+   and assignment statements. Both would have the shape 
+
+       [Name, "=", VJSON]
+
+   in our JSON syntax.
+
+   What's good/bad for a sw dev about this design choice? 
+   [We can also discuss this when we get to assignment
+   statements in a bit, if it stumps you right now.]
