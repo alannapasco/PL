@@ -19,4 +19,9 @@ public class BooleanRepresentation implements IMeaning {
         return this.value == br.value;
     }
 
+    @Override
+    public String toString(){
+        return Boolean.toString(this.value);
+    }
+
 }

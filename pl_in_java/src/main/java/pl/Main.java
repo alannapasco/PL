@@ -1,10 +1,8 @@
 package pl;
 import com.google.gson.*;
 import pl.AST.*;
-import pl.TypePrediction.TypePrediction;
 
 import java.util.ArrayList;
-import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
@@ -21,22 +19,45 @@ public class Main {
         ArrayList<JsonElement> mixedTypeExpOutput = Utils.processJsonExampleSeries("mixed-type-expOut.json");
         Utils.testCmp(mixedTypeExamples, mixedTypeExpOutput);
 
+        Main.process(booleanExamples);
+        Main.process(integerExamples);
+        Main.process(mixedTypeExamples);
 
         ///////----Parse----///////
-        System.out.println();
-        Stream<AST> parsed = booleanExamples.stream().map(Main::parse);
-        parsed.forEach(System.out::println);
-        System.out.println();
+//        System.out.println();
+//        Stream<AST> parsed = booleanExamples.stream().map(Main::parse);
+//        parsed.forEach(System.out::println);
+//        System.out.println();
+//
+//        parsed = integerExamples.stream().map(Main::parse);
+//        parsed.forEach(System.out::println);
+//        System.out.println();
+//
+//        parsed = mixedTypeExamples.stream().map(Main::parse);
+//        parsed.forEach(System.out::println);
+//        System.out.println();
 
-        parsed = integerExamples.stream().map(Main::parse);
-        parsed.forEach(System.out::println);
-        System.out.println();
-
-        parsed = mixedTypeExamples.stream().map(Main::parse);
-        parsed.forEach(System.out::println);
-        System.out.println();
     }
 
+    /**
+     * Processes (parses -> type checks -> determines the value of) the given input examples
+     */
+    public static void process(ArrayList<JsonElement> examples) {
+        for (JsonElement example: examples) {
+            AST ast = Main.parse(example);
+            try {
+                ast.typeCheck();
+                System.out.println(ast.value());
+            } catch (Exception e) {
+                //Type Check failed
+                System.out.println("Invalid Example");
+            }
+        }
+    }
+
+    /**
+     * Produces an abstract syntax tree
+     */
     public static AST parse(JsonElement element) {
         if (element.isJsonPrimitive()) {
             return Main.parsePrimitive(element.getAsJsonPrimitive());
@@ -65,6 +86,9 @@ public class Main {
         return new ASTError("Not Valid AST: " + element + " ");
     }
 
+    /**
+     * Parses a single node in an abstract syntax tree
+     */
     private static AST parsePrimitive(JsonPrimitive element) {
         try {
             int i = element.getAsInt();

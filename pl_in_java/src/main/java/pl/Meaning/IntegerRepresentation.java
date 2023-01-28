@@ -18,4 +18,9 @@ public class IntegerRepresentation implements IMeaning {
         IntegerRepresentation ir = (IntegerRepresentation) o;
         return this.value == ir.value;
     }
+
+    @Override
+    public String toString(){
+        return Integer.toString(this.value);
+    }
 }
