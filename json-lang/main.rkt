@@ -20,10 +20,10 @@
 (define-syntax (mb stx)
   (syntax-parse stx 
     [(_ e ...)
-     (define e* (syntax->list #`((json-expression e) ...)))
+     (define js #`((json-expression e) ...))
+     (define e* (syntax->list js))
      (for-each tc-le e* (syntax->list #`(e ...)))
-     #`(#%printing-module-begin
-        (json-expression e) ...)]))
+     #`(#%printing-module-begin #,@js)]))
 
 ;; ---------------------------------------------------------------------------------------------------
 ;; hand-rolled type checker 
@@ -40,9 +40,12 @@
       [x:id (cadr (assq (syntax-e #'x) env))]
       [((~literal let-values) (((x:id) ((~literal begin) ((~literal quote) t:str) rhs))) body)
        (define t-rhs (tc #'rhs env))       
-       (if (equal? t-rhs (syntax-e #'t))
-           (tc #'body (cons [list (syntax-e #'x) (syntax-e #'t)] env))
-           (raise-syntax-error #false "type error" source #'rhs))]
+       (cond
+         [(equal? t-rhs (syntax-e #'t))
+          (tc #'body (cons [list (syntax-e #'x) (syntax-e #'t)] env))]
+         [else
+          (define msg (~a "type of rhs (" t-rhs ") doesn't match declared type (" (syntax-e #'t) ")"))
+           (raise-syntax-error #false msg source #'rhs)])]
       
       [((~literal quote) n:number)  "int"]
       [((~literal quote) b:boolean) "bool"]
@@ -88,7 +91,9 @@
                ((~datum unquote) body)))
      #`(let ([#,(string->identfier #'x) (begin 't (json-expression rhs))]) (json-expression body))]
     [(_ x:string)
-     #`#,(string->identfier #'x)]))
+     #`#,(string->identfier #'x)]
+    
+    [(_ . x) (raise-syntax-error #false "syntax error" #'x #f (syntax->list #'x))]))
 
 (define (andd x y) (and x y))
 (define (ord x y) (or x y))
