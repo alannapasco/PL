@@ -12,6 +12,7 @@ import pl.Meaning.IntegerRepresentation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -50,33 +51,31 @@ public class Utils {
 
     /**helps compare input/output for automated testing */
     public static void testCmp(ArrayList<JsonElement> actual, ArrayList<JsonElement> expOutput){
-        System.out.println();
-        List<IMeaning> actualOut = new ArrayList<>();
+        List<IMeaning> inputValuesActual = new ArrayList<>();
 
         for (JsonElement example: actual) {
             AST parsed = Main.parse(example);
             try {
-                parsed.typeCheck();
-                actualOut.add(parsed.value());
+                parsed.typeCheck(new LinkedList<>());
+                inputValuesActual.add(parsed.value(new LinkedList<>()));
             } catch (Exception e) {
                 //pass over invalid
             }
         }
 
-        List<IMeaning> expOut = new ArrayList<>();
+        List<IMeaning> inputValuesExpected = new ArrayList<>();
         for (JsonElement solution: expOutput) {
             try {
                 int s = solution.getAsInt();
-                expOut.add(new IntegerRepresentation(s));
+                inputValuesExpected.add(new IntegerRepresentation(s));
             } catch (NumberFormatException e) {
                 boolean s = solution.getAsBoolean();
-                expOut.add(new BooleanRepresentation(s));
+                inputValuesExpected.add(new BooleanRepresentation(s));
             }
-
         }
 
-        for (int i=0; i<expOutput.size(); i++){
-            if (actualOut.get(i).equals(expOut.get(i))){
+        for (int i=0; i<inputValuesExpected.size(); i++){
+            if (inputValuesActual.get(i).equals(inputValuesExpected.get(i))){
                 System.out.println("Test Passed: " + i);
             } else {
                 System.out.println("Test Failed: " + i);

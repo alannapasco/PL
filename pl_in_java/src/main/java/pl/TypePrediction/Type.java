@@ -1,6 +1,6 @@
 package pl.TypePrediction;
 
-public enum TypePrediction {
+public enum Type {
     BOOLEAN,
     INTEGER
 }

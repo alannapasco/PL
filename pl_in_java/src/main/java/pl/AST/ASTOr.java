@@ -2,7 +2,11 @@ package pl.AST;
 
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
-import pl.TypePrediction.TypePrediction;
+import pl.SymbolTable.TypeEntry;
+import pl.SymbolTable.ValueEntry;
+import pl.TypePrediction.Type;
+
+import java.util.LinkedList;
 
 public class ASTOr implements AST {
     final AST firstVal;
@@ -14,21 +18,19 @@ public class ASTOr implements AST {
     }
 
     @Override
-    public TypePrediction typeCheck() throws Exception {
-        if (this.firstVal.typeCheck()==TypePrediction.BOOLEAN
-                && this.secondVal.typeCheck()==TypePrediction.BOOLEAN) {
-            return TypePrediction.BOOLEAN;
+    public Type typeCheck(LinkedList<TypeEntry> accumulator) throws Exception {
+        if (this.firstVal.typeCheck(accumulator)== Type.BOOLEAN
+                && this.secondVal.typeCheck(accumulator)== Type.BOOLEAN) {
+            return Type.BOOLEAN;
         } else {
             throw new Exception("Type Error");
         }
     }
 
     @Override
-    public IMeaning value() throws Exception {
-        if (this.firstVal.value() instanceof BooleanRepresentation
-                && this.secondVal.value() instanceof BooleanRepresentation) {
-            BooleanRepresentation firstValBool = (BooleanRepresentation) this.firstVal.value();
-            BooleanRepresentation secondValBool = (BooleanRepresentation) this.secondVal.value();
+    public IMeaning value(LinkedList<ValueEntry> accumulator) throws Exception {
+        if (this.firstVal.value(accumulator) instanceof BooleanRepresentation firstValBool
+                && this.secondVal.value(accumulator) instanceof BooleanRepresentation secondValBool) {
             return new BooleanRepresentation(firstValBool.value || secondValBool.value);
         }else {
             throw new Exception("Invalid " + this.getClass().toString());

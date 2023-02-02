@@ -1,7 +1,11 @@
 package pl.AST;
 
 import pl.Meaning.IMeaning;
-import pl.TypePrediction.TypePrediction;
+import pl.SymbolTable.TypeEntry;
+import pl.SymbolTable.ValueEntry;
+import pl.TypePrediction.Type;
+
+import java.util.LinkedList;
 
 public class ASTError implements AST {
     final String message;
@@ -11,17 +15,17 @@ public class ASTError implements AST {
     }
 
     @Override
-    public TypePrediction typeCheck() throws Exception {
+    public Type typeCheck(LinkedList<TypeEntry> accumulator) throws Exception {
         throw new Exception("Type Error");
     }
 
     @Override
-    public IMeaning value() throws Exception {
+    public IMeaning value(LinkedList<ValueEntry> accumulator) throws Exception {
         throw new Exception("Error: " + this.message);
     }
 
     @Override
     public String toString(){
-        return "ASTERROR " + this.message;
+        return "***" + this.message;
     }
 }

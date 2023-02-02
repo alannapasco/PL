@@ -2,7 +2,11 @@ package pl.AST;
 
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
-import pl.TypePrediction.TypePrediction;
+import pl.SymbolTable.TypeEntry;
+import pl.SymbolTable.ValueEntry;
+import pl.TypePrediction.Type;
+
+import java.util.LinkedList;
 
 public class ASTAdd implements AST {
     AST firstVal;
@@ -14,19 +18,19 @@ public class ASTAdd implements AST {
     }
 
     @Override
-    public TypePrediction typeCheck() throws Exception {
-        if (this.firstVal.typeCheck()==TypePrediction.INTEGER
-                && this.secondVal.typeCheck()==TypePrediction.INTEGER) {
-            return TypePrediction.INTEGER;
+    public Type typeCheck(LinkedList<TypeEntry> accumulator) throws Exception {
+        if (this.firstVal.typeCheck(accumulator)== Type.INTEGER
+                && this.secondVal.typeCheck(accumulator)== Type.INTEGER) {
+            return Type.INTEGER;
         } else {
             throw new Exception("Type Error");
         }
     }
 
     @Override
-    public IMeaning value() throws Exception {
-        if (this.firstVal.value() instanceof IntegerRepresentation firstValInt
-                && this.secondVal.value() instanceof IntegerRepresentation secondValInt) {
+    public IMeaning value(LinkedList<ValueEntry> accumulator) throws Exception {
+        if (this.firstVal.value(accumulator) instanceof IntegerRepresentation firstValInt
+                && this.secondVal.value(accumulator) instanceof IntegerRepresentation secondValInt) {
             return new IntegerRepresentation(firstValInt.value + secondValInt.value);
         } else {
             throw new Exception("Invalid " + this.getClass().toString());
