@@ -1,0 +1,59 @@
+
+Scope Problem 2: Static Distance or a Little Bit of Compilation. 
+
+The JSON grammar remains the same: 
+
+  Var JSON (VJSON) is one of:
+   -- true
+   -- false
+   -- [VJSON, "^",  VJSON]
+   -- [VJSON, "&&", VJSON]
+   -- [VJSON, ">",  VJSON]
+   -- Integer (small ones)
+   -- [VJSON, "-",  VJSON]
+   -- [VJSON, "+",  VJSON]
+
+   ;; new expressions:
+
+   -- ["let", Type, Name, "=", VJSON, "in", VJSON]  -- variable declaration 
+   -- Name                                          -- variable occurrence 
+
+   Type is one of:
+   -- "int"
+   -- "bool" 
+
+   Name is a (simple) String (no JSON tricks).
+
+PROGRAMMING TASKS:
+
+6. Add a method to the AST implementation that replaces all variable
+   occurrences with a new AST node that contains a natural number.
+
+   DATA INTERPRETATION The natural number represents how many let
+   declarations are in between the variable occurrence and its
+   declaration.
+
+   A traditional name for this method is staticDistance. 
+
+
+7. Add a method called `valueSD` to the AST implementation. The method
+   interprets the revised ASTs that no longer contain variable
+   occurrences but "static distance" nodes:
+
+   - The method should use an "AST global" stack. When the interpreter
+     encounters a variable declaration, it pushes the variable's
+     meaning on the stack. It pops the stack when it is done
+     evaluating the body of the `let` block. 
+
+   - The method should use the "static distance" -- the natural number
+     recorded in 6 -- to look up the meaning of the variable with a
+     constant-time array access.
+
+   HINT 1 How large will this array have to be at most? (How can this
+   number be computed before the call to `valueSD`?)
+
+   HINT 2 A unit test can simply compare what `value` and `valueSD`
+   compute. Given the same JSON input, the meaning must be the same no
+   matter which meaning method is used.
+
+
