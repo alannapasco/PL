@@ -1,0 +1,91 @@
+
+Scope Problem
+
+Here is a JSON grammar that adds simple functions to our language: 
+
+  Var JSON (FJSON) is one of:
+   -- true
+   -- false
+   -- [FJSON, "^",  FJSON]
+   -- [FJSON, "&&", FJSON]
+   -- [FJSON, ">",  FJSON]
+   -- Integer (small ones)
+   -- [FJSON, "-",  FJSON]
+   -- [FJSON, "+",  FJSON]
+   -- Name                                        
+
+   ;; revised expression:			-- to make your life easier 
+   -- ["let", "var", Type, Name, "=", FJSON, "in", FJSON]
+
+   ;; new expressions:
+
+   -- ["let", "fun", Type, Name, [Type, Name], FJSON, "in", FJSON]  -- function definition 
+   -- ["call", Name, FJSON]	 		-- function call 
+   
+   Type is one of:
+   -- "int"
+   -- "bool" 
+
+   Name is a (simple) String (no JSON tricks).
+
+INTERPRETATION
+
+ ["let", "var", ..., "in", s] is a variable declaration for scope s
+ ["let", "fun", ..., "in", s] is a function declaration for scope s 
+
+ "fun", rt, f, [at, x], rhs is the equivalent of a mathematical function:
+
+ 	f : at -> rt
+	f(x) = rhs
+
+ or a C-like function of the shape (Java static)
+
+      rt f(at x) {
+        return rhs;
+      }
+
+ ["call", f, a] is a function use in math, as in f(a) or a function
+ call in C/Java:
+
+      f(a)
+
+PROGRAMMING TASKS:
+
+1. Revise the parser to accept FJSON.
+
+2. Revise the type checker to check the suitably extended AST.
+
+   Consider adding an "internal" type for functions:
+
+     class FunType implements Type {
+       Type domain;
+       Yype range:
+     }
+
+   and giving functions this type and variables get their usual one. 
+
+3. Revise the `value` function to consume instance of the revised AST. 
+
+   This one is tricky and we need to talk about it, But here is the
+   basic idea:
+
+     class FunMeaning implements Meaning {
+       Environment env;         // that's what we need to discuss 
+       VarAST      parameter;
+       AST         rhs;        
+     }
+
+
+   Why?
+
+   What should Meaning be of the following expression:
+
+   ["let", "var", "int", "x", "=", 5,
+    "in",
+         ["let", "fun", "int", "f", ["int", "y"], "x"
+	  "in",
+	        ["let", "var", "int", "x", "=", 42,
+		 "in",
+		      ["call", "f", 10 ]]]]
+       
+   
