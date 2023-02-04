@@ -1,5 +1,5 @@
 
-Scope Problem
+Function Problem
 
 Here is a JSON grammar that adds simple functions to our language: 
 
@@ -90,6 +90,9 @@ PROGRAMMING TASKS:
        AST         rhs;        
      }
 
-   Static Scope vs Dynamic Scope
-   
+
+DEVELOPER-FACING QUESTION: 
+
+  Why is "static scope" better than "dynamic scope"?
+
 

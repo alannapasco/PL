@@ -7,6 +7,8 @@ Language Concepts, Language Features
 - types and type checking 
 - variable declarations and scope
 - function declaration, more scope, more types
+  - variable declaration from "immediate function application"
+  - developer-facing: why is "static scope" better than "dynamic scope"
 - assignment statements, call-by-value 
   - simply typed variables only 
   - the programs still terminate 
@@ -14,6 +16,7 @@ Language Concepts, Language Features
   - programs may diverge, but the type checker will terminate
   - syntactic abbreviations?
 - higher-order functions, more types 
+  - recursion from assignment 
 
 - specification vs implementation
   - typing rules vs logic vs type checker 

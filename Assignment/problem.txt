@@ -1,0 +1,63 @@
+
+Assignment Problem
+
+Here is a JSON grammar that adds simple functions to our language: 
+
+  Var JSON (AJSON) is one of:
+   -- true
+   -- false
+   -- [AJSON, "^",  AJSON]
+   -- [AJSON, "&&", AJSON]
+   -- [AJSON, ">",  AJSON]
+   -- Integer (small ones)
+   -- [AJSON, "-",  AJSON]
+   -- [AJSON, "+",  AJSON]
+   -- Name                                        
+   -- ["let", "var", Type, Name, "=", AJSON, "in", AJSON]
+   -- ["let", "fun", Type, Name, [Type, Name], AJSON, "in", AJSON]
+   -- ["call", Name, AJSON]	 		
+
+   ;; new expressions:
+
+   -- ["set", Name, AJSON]
+
+   Type is one of:
+   -- "int"
+   -- "bool" 
+
+   Name is a (simple) String (no JSON tricks).
+
+INTERPRETATION
+
+ ["set", x, rhs] is a variable assignment
+ - x must be a typed variable
+ - its type and the type of rhs must be the same
+ - `value` changes what `x` stands for and returns the old value of `x`
+ 
+PROGRAMMING TASKS:
+
+1. Revise the parser to accept AJSON.
+2. Revise the type checker to check the suitably extended AST.
+3. Revise the `value` function to consume instance of the revised AST. 
+
+   This one is tricky and we need to talk about it.
+
+   What should the Meaning be of the following expression:
+
+   ["let", "var", "int", "x", "=", 5,
+    "in",
+         [["let", "fun", "int", "f", ["int", "y"], ["set", "x", "y"]
+	   "in",
+	         ["let", "var", "int", "x", "=", 42,
+	 	  "in",
+		       [["call", "f", 10 ],
+		        "+",
+		        [["call", "f", 20 ]]]]]
+           "+",
+	   "x"]]
+			
+   - 15?
+   - Why?
+   - This _is_ object-oriented programming in the purest sense.
+
+4. Translate this program into Java and Python. 
