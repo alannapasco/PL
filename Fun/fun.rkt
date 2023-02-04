@@ -177,36 +177,46 @@ exec racket -tm "$0" -- ${1+"$@"}
 (define (value b env)
   (match b
     [(? exact-integer? b) b]
+
     [(? boolean? b) b]
     [`(&& ,left  ,right) (and (bcast (value left env)) (bcast (value right env)))]
     [`(|| ,left ,right)  (or  (bcast (value left env)) (bcast (value right env)))]
+
     [(? exact-integer? b) b]
     [`(++ ,left  ,right) (+ (icast (value left env)) (icast (value right env)))]
     [`(-- ,left  ,right) (- (icast (value left env)) (icast (value right env)))]
     [`(<< ,left  ,right) (< (icast (value left env)) (icast (value right env)))]
-    [`(let ,t ,x ,rhs ,body) (value body (cons [list x (value rhs env)] env))]
-    [(? symbol? x)
-     (define v (assq x env))
-     (unless v
-       (error 'value "can't happen ~a" x))
-     (second v)]
+
+    [`(let ,t ,x ,rhs ,body) (value body (env-add env x (value rhs env)))]
+    [(? symbol? x) (env-retrieve env x "can't happen (variable undefined) ~a")]
 
     [`(fun ,t ,f ,x ,rhs ,body)
-     (define c (list x rhs env))
-     (value body (cons [list f c] env))]
+     (define c (create-closure x rhs env))
+     (value body (env-add env f c))]
     [`(cal ,f ,a)
-     (define v (assq f env))
-     (unless v
-       (error 'value "can't happen ~a" f))
-     (define c (second v))
-     (c-apply c (value a env))]))
+     (define c (env-retrieve env f "can't happen (function undefined) ~a"))
+     (closure-apply c (value a env))]))
 
-(: c-apply (-> Meaning Meaning Meaning))
-(define (c-apply c a)
+(: closure-apply (-> Meaning Meaning Meaning))
+(define (closure-apply c a)
   (match c
     [`(,x ,rhs ,env) (value rhs (cons [list x a] env))]
     [_ (error 'c-apply "can't happen: ~a\n" c)]))
 
+(: create-closure (-> Symbol AST Env Closure))
+(define (create-closure x rhs env)
+  (list x rhs env))
+
+(: env-add (-> Env Symbol Meaning Env))
+(define (env-add env x m)
+  (cons [list x m] env))
+
+(: env-retrieve (-> Env Symbol String Meaning))
+(define (env-retrieve env x fmt)
+  (define v (assq x env))
+  (unless v (error 'value fmt x))
+  (second v))
+  
 ;; -----------------------------------------------------------------------------
 ;; -----------------------------------------------------------------------------
 ;; integration and unit tests

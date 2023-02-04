@@ -18,7 +18,10 @@ Language Concepts, Language Features
 - higher-order functions, more types 
   - recursion from assignment 
 
-- specification vs implementation
+- specification vs implementation; "meta" properties 
+  - duality of language features: introduction, elimination
+    - arithmetic seems to stand out 
+    - "set" stands out 
   - typing rules vs logic vs type checker 
   - theorems (meta theorems)
     - type checking predicts perfectly (exn, termination)
@@ -31,7 +34,7 @@ More Language Features (?)
 
   - call-by-reference, different from call-by-name; aliasing
 
-  - exceptions -- add /
+  - exceptions -- add / or arrays, buffer overflow 
   - exception handlers -- meta handlers
 
   - gradual typing
