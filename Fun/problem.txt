@@ -66,8 +66,23 @@ PROGRAMMING TASKS:
 
 3. Revise the `value` function to consume instance of the revised AST. 
 
-   This one is tricky and we need to talk about it, But here is the
-   basic idea:
+   This one is tricky and we need to talk about it.
+
+   What should Meaning be of the following expression:
+
+   ["let", "var", "int", "x", "=", 5,
+    "in",
+         ["let", "fun", "int", "f", ["int", "y"], ["x", "+", "y"]
+	  "in",
+	        ["let", "var", "int", "x", "=", 42,
+		 "in",
+		      ["call", "f", 10 ]]]]
+
+   - 15?
+   - 52? 
+   - Why?
+
+   Here is the basic idea:
 
      class FunMeaning implements Meaning {
        Environment env;         // that's what we need to discuss 
@@ -75,17 +90,6 @@ PROGRAMMING TASKS:
        AST         rhs;        
      }
 
-
-   Why?
-
-   What should Meaning be of the following expression:
-
-   ["let", "var", "int", "x", "=", 5,
-    "in",
-         ["let", "fun", "int", "f", ["int", "y"], "x"
-	  "in",
-	        ["let", "var", "int", "x", "=", 42,
-		 "in",
-		      ["call", "f", 10 ]]]]
-       
+   Static Scope vs Dynamic Scope
    
+
