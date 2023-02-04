@@ -172,6 +172,7 @@ exec racket -tm "$0" -- ${1+"$@"}
 
 (define-syntax-rule (bcast e) (cast e Boolean))
 (define-syntax-rule (icast e) (cast e Integer))
+(define-syntax-rule (ccast e) (cast e Closure))
 
 (: value (-> AST Env Meaning))
 (define (value b env)
@@ -195,17 +196,17 @@ exec racket -tm "$0" -- ${1+"$@"}
      (value body (env-add env f c))]
     [`(cal ,f ,a)
      (define c (env-retrieve env f "can't happen (function undefined) ~a"))
-     (closure-apply c (value a env))]))
-
-(: closure-apply (-> Meaning Meaning Meaning))
-(define (closure-apply c a)
-  (match c
-    [`(,x ,rhs ,env) (value rhs (cons [list x a] env))]
-    [_ (error 'c-apply "can't happen: ~a\n" c)]))
+     (closure-apply (ccast c) (value a env))]))
 
 (: create-closure (-> Symbol AST Env Closure))
 (define (create-closure x rhs env)
   (list x rhs env))
+
+(: closure-apply (-> Closure Meaning Meaning))
+(define (closure-apply c a)
+  (match c
+    [`(,x ,rhs ,env) (value rhs (cons [list x a] env))]
+    [_ (error 'c-apply "can't happen: ~a\n" c)]))
 
 (: env-add (-> Env Symbol Meaning Env))
 (define (env-add env x m)
