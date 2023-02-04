@@ -34,8 +34,10 @@ More Language Features (?)
 
   - call-by-reference, different from call-by-name; aliasing
 
+  - statements -- add Void to Type 
+
   - exceptions -- add / or arrays, buffer overflow 
-  - exception handlers -- meta handlers
+  - exception handlers -- meta handlers (??)
 
   - gradual typing
     - a la TypeSscript 
