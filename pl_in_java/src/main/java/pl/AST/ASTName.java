@@ -1,11 +1,9 @@
 package pl.AST;
 
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.TypeEntry;
-import pl.SymbolTable.ValueEntry;
+import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
 
-import java.util.LinkedList;
 
 public class ASTName implements AST {
     String name;
@@ -15,23 +13,21 @@ public class ASTName implements AST {
     }
 
     @Override
-    public Type typeCheck(LinkedList<TypeEntry> accumulator) throws Exception {
-        for (TypeEntry e : accumulator) {
-            if (e.name().equals(this.name)){
-                return e.type();
-            }
+    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
+        try {
+            return accumulator.get(this.name);
+        } catch (Exception e) {
+            throw new Exception("Type Error");
         }
-        throw new Exception("Type Error");
     }
 
     @Override
-    public IMeaning value(LinkedList<ValueEntry> accumulator) throws Exception {
-        for (ValueEntry e : accumulator) {
-            if (e.name().equals(this.name)){
-                return e.value();
-            }
+    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
+        try {
+            return accumulator.get(this.name);
+        } catch (Exception e) {
+            throw new Exception("Invalid " + this.getClass().toString());
         }
-        throw new Exception("Invalid " + this.getClass().toString());
     }
 
     @Override

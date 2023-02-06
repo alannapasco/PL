@@ -1,11 +1,9 @@
 package pl.AST;
 
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.TypeEntry;
-import pl.SymbolTable.ValueEntry;
+import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
 
-import java.util.LinkedList;
 
 public class ASTLet implements AST{
     Type varType;
@@ -21,25 +19,18 @@ public class ASTLet implements AST{
     }
 
     @Override
-    public Type typeCheck(LinkedList<TypeEntry> accumulator) throws Exception {
-        //update the accumulator with a new Entry for the new variable (type)
-        accumulator.add(new TypeEntry(this.varName, this.varType));
-
-        //Then, perform typeCheck() on the SCOPE
-        return this.scope.typeCheck(accumulator);
-        //after performing typecheck, you could pop off the new entry to ensure it isn't available
-        //outside its scope (or leave it to garbage)
+    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
+        Type typeVerified = varValue.typeCheck(accumulator);
+        if (!typeVerified.equals(varType)) {
+            throw new Exception("Type Error");
+        }
+        return this.scope.typeCheck(new Accumulator<>(this.varName, this.varType, accumulator));
     }
 
     @Override
-    public IMeaning value(LinkedList<ValueEntry> accumulator) throws Exception {
-        //update the accumulator with a new Entry for the new variable (the variable value, not the value of the whole let expression)
-        accumulator.add(new ValueEntry(this.varName, this.varValue.value(accumulator)));
-
-        //then, perform value() on the SCOPE
-        return this.scope.value(accumulator);
-        //after performing value, you could pop off the new entry to ensure it isn't available
-        //outside its scope (or leave it to garbage)
+    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
+        IMeaning valueOfVariable = this.varValue.value(accumulator);
+        return this.scope.value(new Accumulator<>(this.varName, valueOfVariable, accumulator));
     }
 
     @Override

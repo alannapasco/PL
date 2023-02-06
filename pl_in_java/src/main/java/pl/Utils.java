@@ -8,11 +8,11 @@ import pl.AST.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
+import pl.SymbolTable.Accumulator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -56,8 +56,8 @@ public class Utils {
         for (JsonElement example: actual) {
             AST parsed = Main.parse(example);
             try {
-                parsed.typeCheck(new LinkedList<>());
-                inputValuesActual.add(parsed.value(new LinkedList<>()));
+                parsed.typeCheck(new Accumulator<>());
+                inputValuesActual.add(parsed.value(new Accumulator<>()));
             } catch (Exception e) {
                 //pass over invalid
             }

@@ -1,8 +1,7 @@
 package pl.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.TypeEntry;
-import pl.SymbolTable.ValueEntry;
+import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
 
 import java.util.LinkedList;
@@ -15,12 +14,12 @@ public class ASTBoolean implements AST {
     }
 
     @Override
-    public Type typeCheck(LinkedList<TypeEntry> accumulator) {
+    public Type typeCheck(Accumulator<Type> accumulator) {
         return Type.BOOLEAN;
     }
 
     @Override
-    public IMeaning value(LinkedList<ValueEntry> accumulator) {
+    public IMeaning value(Accumulator<IMeaning> accumulator) {
         return new BooleanRepresentation(this.value);
     }
 

@@ -1,11 +1,8 @@
 package pl.AST;
 
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.TypeEntry;
-import pl.SymbolTable.ValueEntry;
+import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
-
-import java.util.LinkedList;
 
 /**
  AST is a tree-shaped diagram
@@ -38,11 +35,11 @@ public interface AST {
     /**
      * Classifies the expression as either int type or bool type
      */
-    Type typeCheck(LinkedList<TypeEntry> accumulator) throws Exception;
+    Type typeCheck(Accumulator<Type> accumulator) throws Exception;
 
     /**
      * Determines the value of the AST expression
      */
-    IMeaning value(LinkedList<ValueEntry> accumulator) throws Exception;
+    IMeaning value(Accumulator<IMeaning> accumulator) throws Exception;
 
 }

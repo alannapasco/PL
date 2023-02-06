@@ -2,8 +2,7 @@ package pl.AST;
 
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
-import pl.SymbolTable.TypeEntry;
-import pl.SymbolTable.ValueEntry;
+import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
 
 import java.util.LinkedList;
@@ -16,12 +15,12 @@ public class ASTInteger implements AST {
     }
 
     @Override
-    public Type typeCheck(LinkedList<TypeEntry> accumulator) {
+    public Type typeCheck(Accumulator<Type> accumulator) {
         return Type.INTEGER;
     }
 
     @Override
-    public IMeaning value(LinkedList<ValueEntry> accumulator) {
+    public IMeaning value(Accumulator<IMeaning> accumulator) {
         return new IntegerRepresentation(this.value);
     }
 

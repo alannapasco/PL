@@ -2,8 +2,7 @@ package pl.AST;
 
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
-import pl.SymbolTable.TypeEntry;
-import pl.SymbolTable.ValueEntry;
+import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
 
 import java.util.LinkedList;
@@ -18,7 +17,7 @@ public class ASTAdd implements AST {
     }
 
     @Override
-    public Type typeCheck(LinkedList<TypeEntry> accumulator) throws Exception {
+    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
         if (this.firstVal.typeCheck(accumulator)== Type.INTEGER
                 && this.secondVal.typeCheck(accumulator)== Type.INTEGER) {
             return Type.INTEGER;
@@ -28,7 +27,7 @@ public class ASTAdd implements AST {
     }
 
     @Override
-    public IMeaning value(LinkedList<ValueEntry> accumulator) throws Exception {
+    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
         if (this.firstVal.value(accumulator) instanceof IntegerRepresentation firstValInt
                 && this.secondVal.value(accumulator) instanceof IntegerRepresentation secondValInt) {
             return new IntegerRepresentation(firstValInt.value + secondValInt.value);

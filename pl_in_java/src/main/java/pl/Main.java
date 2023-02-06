@@ -1,11 +1,10 @@
 package pl;
 import com.google.gson.*;
 import pl.AST.*;
-import pl.SymbolTable.TypeEntry;
 import pl.TypePrediction.Type;
+import pl.SymbolTable.Accumulator;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.stream.Stream;
 
 public class Main {
@@ -34,8 +33,8 @@ public class Main {
         for (JsonElement example: examples) {
             AST ast = Main.parse(example);
             try {
-                ast.typeCheck(new LinkedList<>());
-                System.out.println(ast.value(new LinkedList<>()));
+                ast.typeCheck(new Accumulator<>());
+                System.out.println(ast.value(new Accumulator<>()));
             } catch (Exception e) {
                 //Type Check failed
                 System.out.println("Invalid Type Example");
