@@ -1,10 +1,9 @@
 package pl.AST;
 
+import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
-
-import java.util.LinkedList;
 
 public class ASTError implements AST {
     final String message;
@@ -20,6 +19,21 @@ public class ASTError implements AST {
 
     @Override
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
+        throw new Exception("Error: " + this.message);
+    }
+
+    @Override
+    public AST staticDistance(String[] acc, int tailIdx) {
+        return this;
+    }
+
+    @Override
+    public int countNumLets(int count) {
+        return count;
+    }
+
+    @Override
+    public IMeaning valueSD(IMeaning[] acc, int tailIdx) throws Exception {
         throw new Exception("Error: " + this.message);
     }
 

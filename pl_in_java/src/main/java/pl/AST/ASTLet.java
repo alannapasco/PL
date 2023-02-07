@@ -34,6 +34,24 @@ public class ASTLet implements AST{
     }
 
     @Override
+    public AST staticDistance(String[] acc, int tailIdx)  {
+        acc[tailIdx] = this.varName;
+        return new ASTLet(this.varType, this.varName, this.varValue.staticDistance(acc, tailIdx-1), this.scope.staticDistance(acc, tailIdx-1));
+    }
+
+    @Override
+    public int countNumLets(int count) {
+        return this.scope.countNumLets(count) + 1;
+    }
+
+    @Override
+    public IMeaning valueSD(IMeaning[] acc, int tailIdx) throws Exception {
+        tailIdx--;
+        acc[tailIdx] = this.varValue.valueSD(acc, tailIdx);
+        return this.scope.valueSD(acc, tailIdx);
+    }
+
+    @Override
     public String toString(){
         return "[let " + this.varType + " " + this.varName + " = " + this.varValue.toString() + " in " + this.scope.toString() + "]";
     }

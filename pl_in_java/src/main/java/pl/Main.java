@@ -1,6 +1,7 @@
 package pl;
 import com.google.gson.*;
 import pl.AST.*;
+import pl.Meaning.IMeaning;
 import pl.TypePrediction.Type;
 import pl.SymbolTable.Accumulator;
 
@@ -13,25 +14,59 @@ public class Main {
         ArrayList<JsonElement> input = Utils.processJsonExampleSeries("input.json");
         ArrayList<JsonElement> output = Utils.processJsonExampleSeries("output.json");
 
-        ///////----Parse----///////
-        System.out.println("parsing AST results:");
-        Stream<AST> parsed = input.stream().map(Main::parse);
-        parsed.forEach(System.out::println);
-        System.out.println();
+//        Stream<AST> parsed = input.stream().map(Main::parse);
+//        parsed.forEach(System.out::println);
 
-        System.out.println("Parse -> typecheck -> value results:");
-        Main.process(input);
-
-        System.out.println("Tests:");
         Utils.testCmp(input, output);
+        Main.processWithStaticDistance(input);
     }
+
+    /**
+     * Processes (parses -> type checks -> determines the value of) the given input examples
+     * by first converting all examples to a staticDistance AST
+     */
+    public static void processWithStaticDistance(ArrayList<JsonElement> examples) {
+        System.out.println("\n---------- SD AST - Parse -> typecheck -> value results: ----------");
+        for (JsonElement example: examples) {
+            AST ast = Main.parse(example);
+
+            int numLets = ast.countNumLets(0);
+            String[] sdAcc = new String[numLets];
+            IMeaning[] valAcc = new IMeaning[numLets];
+            AST astWithSD = ast.staticDistance(sdAcc, numLets-1);
+
+            System.out.print("OR AST: ");
+            System.out.println(ast);
+            System.out.print("SD AST: ");
+            System.out.println(astWithSD);
+
+            try {
+                ast.typeCheck(new Accumulator<>());
+
+                System.out.print("value:   ");
+                System.out.println(ast.value(new Accumulator<>()));
+                System.out.print("valueSD: ");
+                System.out.println(astWithSD.valueSD(valAcc, numLets));
+                System.out.println();
+            } catch (Exception e) {
+                //Type Check failed
+                System.out.println("Invalid Type Example\n");
+            }
+        }
+        System.out.println();
+    }
+
 
     /**
      * Processes (parses -> type checks -> determines the value of) the given input examples
      */
     public static void process(ArrayList<JsonElement> examples) {
+        System.out.println("---------- Parse -> typecheck -> value results: ----------");
         for (JsonElement example: examples) {
             AST ast = Main.parse(example);
+            System.out.print("AST:   ");
+            System.out.println(ast);
+            System.out.print("value: ");
             try {
                 ast.typeCheck(new Accumulator<>());
                 System.out.println(ast.value(new Accumulator<>()));
@@ -42,6 +77,7 @@ public class Main {
         }
         System.out.println();
     }
+
 
     /**
      * Produces an abstract syntax tree which represents a JSONLang program
@@ -83,6 +119,7 @@ public class Main {
         if (expression.size()==3) {
             return Main.parseOperation(expression);
         } else if (expression.get(0).getAsString().equals("let")){
+
             return Main.parseVariableAssignment(expression);
         }
         return new ASTError("Invalid Expression: " + expression + " ");

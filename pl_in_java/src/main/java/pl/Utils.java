@@ -1,9 +1,6 @@
 package pl;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import pl.AST.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
@@ -13,7 +10,6 @@ import pl.SymbolTable.Accumulator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Utils {
@@ -51,37 +47,45 @@ public class Utils {
 
     /**helps compare input/output for automated testing */
     public static void testCmp(ArrayList<JsonElement> actual, ArrayList<JsonElement> expOutput){
-        List<IMeaning> inputValuesActual = new ArrayList<>();
+        for (int i=0; i<actual.size(); i++){
 
-        for (JsonElement example: actual) {
-            AST parsed = Main.parse(example);
+            AST ast = Main.parse(actual.get(i));
+
+            int numLets = ast.countNumLets(0);
+            String[] sdAcc = new String[numLets];
+            IMeaning[] valAcc = new IMeaning[numLets];
+            AST astWithSD = ast.staticDistance(sdAcc, numLets-1);
+            IMeaning actualVal;
+            IMeaning actualValSD;
+
             try {
-                parsed.typeCheck(new Accumulator<>());
-                inputValuesActual.add(parsed.value(new Accumulator<>()));
+                ast.typeCheck(new Accumulator<>());
+                actualVal = ast.value(new Accumulator<>());
+                actualValSD = astWithSD.valueSD(valAcc, numLets-1);
             } catch (Exception e) {
                 //pass over invalid
+                continue;
             }
-        }
 
-        List<IMeaning> inputValuesExpected = new ArrayList<>();
-        for (JsonElement solution: expOutput) {
-            try {
-                int s = solution.getAsInt();
-                inputValuesExpected.add(new IntegerRepresentation(s));
-            } catch (NumberFormatException e) {
-                boolean s = solution.getAsBoolean();
-                inputValuesExpected.add(new BooleanRepresentation(s));
-            }
-        }
-
-        for (int i=0; i<inputValuesExpected.size(); i++){
-            if (inputValuesActual.get(i).equals(inputValuesExpected.get(i))){
+            IMeaning expectedVal = Utils.getExpected(expOutput.get(i-14).getAsJsonPrimitive());
+            if (expectedVal.equals(actualVal) && expectedVal.equals(actualValSD)){
                 System.out.println("Test Passed: " + i);
             } else {
                 System.out.println("Test Failed: " + i);
-                System.out.println("Expected: " + expOutput.get(i));
-                System.out.println("Actual: " + actual.get(i));
+                System.out.println("Expected: " + expectedVal);
+                System.out.println("Actual: " + actualVal);
+                System.out.println("ActualSD: " + actualValSD);
             }
+        }
+    }
+
+    private static IMeaning getExpected(JsonPrimitive expected){
+        try {
+            int i = expected.getAsInt();
+            return new IntegerRepresentation(i);
+        } catch (NumberFormatException e) {
+            boolean b = expected.getAsBoolean();
+            return new BooleanRepresentation(b);
         }
     }
 

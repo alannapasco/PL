@@ -2,8 +2,8 @@ package pl.SymbolTable;
 
 public class Accumulator<T> {
     public final String name;
-    public final T data;
-    public final Accumulator<T> rest;
+    public T data;
+    public Accumulator<T> rest;
 
     public Accumulator(String name, T data, Accumulator<T> rest){
         this.name = name;
@@ -26,5 +26,11 @@ public class Accumulator<T> {
         } else {
             return this.rest.get(name);
         }
+    }
+
+    /**
+     * EFFECT: None
+     */
+    protected void incrementAll() throws Exception {
     }
 }
