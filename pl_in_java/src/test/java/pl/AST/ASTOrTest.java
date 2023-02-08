@@ -43,7 +43,7 @@ public class ASTOrTest extends ParentTest{
 
     @Test
     public void countNumLets() {
-        assertEquals(0, orFT.countNumLets(0));
+        assertEquals(0, orFT.countNumLetsInAST(0));
     }
 
     @Test

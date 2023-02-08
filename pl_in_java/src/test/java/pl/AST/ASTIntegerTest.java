@@ -28,8 +28,8 @@ public class ASTIntegerTest extends ParentTest{
 
     @Test
     public void countNumLets() {
-        assertEquals(one.countNumLets(0), 0);
-        assertEquals(negfive.countNumLets(3), 3);
+        assertEquals(one.countNumLetsInAST(0), 0);
+        assertEquals(negfive.countNumLetsInAST(3), 3);
     }
 
     @Test

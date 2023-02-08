@@ -27,10 +27,4 @@ public class Accumulator<T> {
             return this.rest.get(name);
         }
     }
-
-    /**
-     * EFFECT: None
-     */
-    protected void incrementAll() throws Exception {
-    }
 }

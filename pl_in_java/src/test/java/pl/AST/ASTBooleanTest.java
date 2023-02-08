@@ -27,8 +27,8 @@ public class ASTBooleanTest extends ParentTest {
 
     @Test
     public void countNumLets() {
-        assertEquals(t.countNumLets(0), 0);
-        assertEquals(f.countNumLets(3), 3);
+        assertEquals(t.countNumLetsInAST(0), 0);
+        assertEquals(f.countNumLetsInAST(3), 3);
     }
 
     @Test

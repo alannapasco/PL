@@ -1,7 +1,6 @@
 package pl.AST;
 
 import org.junit.Test;
-import pl.Meaning.BooleanRepresentation;
 import pl.TypePrediction.Type;
 
 import static org.junit.Assert.*;
@@ -45,7 +44,7 @@ public class ASTAndTest extends ParentTest {
 
     @Test
     public void countNumLets() {
-        assertEquals(0, andTT.countNumLets(0));
+        assertEquals(0, andTT.countNumLetsInAST(0));
     }
 
     @Test

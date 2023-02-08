@@ -6,7 +6,6 @@ import pl.TypePrediction.Type;
 import pl.SymbolTable.Accumulator;
 
 import java.util.ArrayList;
-import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
@@ -29,31 +28,21 @@ public class Main {
         System.out.println("\n---------- SD AST - Parse -> typecheck -> value results: ----------");
         for (JsonElement example: examples) {
             AST ast = Main.parse(example);
-
-            int numLets = ast.countNumLets(0);
-            String[] sdAcc = new String[numLets];
-            IMeaning[] valAcc = new IMeaning[numLets];
-            AST astWithSD = ast.staticDistance(sdAcc, numLets-1);
-
-            System.out.print("OR AST: ");
-            System.out.println(ast);
-            System.out.print("SD AST: ");
-            System.out.println(astWithSD);
+            AST astWithSD = ast.staticDistance(new Accumulator<>());
+            System.out.println("OR AST: " + ast + "\nSD AST: " + astWithSD);
 
             try {
                 ast.typeCheck(new Accumulator<>());
+                System.out.println("value:   " + ast.value(new Accumulator<>()));
 
-                System.out.print("value:   ");
-                System.out.println(ast.value(new Accumulator<>()));
-                System.out.print("valueSD: ");
-                System.out.println(astWithSD.valueSD(valAcc, numLets));
-                System.out.println();
+                int numLets = ast.countNumLetsInAST(0);
+                IMeaning[] acc = new IMeaning[numLets];
+                System.out.println("valueSD: " + astWithSD.valueSD(acc, numLets-1));
             } catch (Exception e) {
-                //Type Check failed
-                System.out.println("Invalid Type Example\n");
+                System.out.println("Error from Main: " + e);
             }
+            System.out.println();
         }
-        System.out.println();
     }
 
 
@@ -64,12 +53,10 @@ public class Main {
         System.out.println("---------- Parse -> typecheck -> value results: ----------");
         for (JsonElement example: examples) {
             AST ast = Main.parse(example);
-            System.out.print("AST:   ");
-            System.out.println(ast);
-            System.out.print("value: ");
+            System.out.println("AST:   " + ast);
             try {
                 ast.typeCheck(new Accumulator<>());
-                System.out.println(ast.value(new Accumulator<>()));
+                System.out.println("value: " + ast.value(new Accumulator<>()));
             } catch (Exception e) {
                 //Type Check failed
                 System.out.println("Invalid Type Example");

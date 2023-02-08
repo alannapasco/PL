@@ -1,6 +1,5 @@
 package pl.AST;
 
-import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
@@ -23,17 +22,17 @@ public class ASTError implements AST {
     }
 
     @Override
-    public AST staticDistance(String[] acc, int tailIdx) {
+    public AST staticDistance(Accumulator<Integer> accumulator) {
         return this;
     }
 
     @Override
-    public int countNumLets(int count) {
+    public int countNumLetsInAST(int count) {
         return count;
     }
 
     @Override
-    public IMeaning valueSD(IMeaning[] acc, int tailIdx) throws Exception {
+    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
         throw new Exception("Error: " + this.message);
     }
 

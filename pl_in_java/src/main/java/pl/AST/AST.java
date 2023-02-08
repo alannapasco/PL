@@ -43,17 +43,18 @@ public interface AST {
     IMeaning value(Accumulator<IMeaning> accumulator) throws Exception;
 
     /**
-     * EFFECT: Replaces all ASTName nodes of this AST to an ASTStaticDistance node
+     * Returns a brand new AST with all ASTName nodes turned to ASTStaticDistance nodes
+     * Integer in Accumulator<Integer> represents the current node's depth in the AST
      */
-    AST staticDistance(String[] acc, int tailIdx);
+    AST staticDistance(Accumulator<Integer> accumulator);
 
     /**
      * Returns the number of let expressions in an AST
      */
-    int countNumLets(int count);
+    int countNumLetsInAST(int count);
 
     /**
      * Interprets the value of an AST that contains SD nodes
      */
-    IMeaning valueSD(IMeaning[] acc, int tailIdx) throws Exception;
+    IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception;
 }

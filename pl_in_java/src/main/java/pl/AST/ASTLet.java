@@ -29,26 +29,33 @@ public class ASTLet implements AST{
 
     @Override
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        IMeaning valueOfVariable = this.varValue.value(accumulator);
-        return this.scope.value(new Accumulator<>(this.varName, valueOfVariable, accumulator));
+        IMeaning valueEvaluated = this.varValue.value(accumulator);
+        return this.scope.value(new Accumulator<>(this.varName, valueEvaluated, accumulator));
     }
 
     @Override
-    public AST staticDistance(String[] acc, int tailIdx)  {
-        acc[tailIdx] = this.varName;
-        return new ASTLet(this.varType, this.varName, this.varValue.staticDistance(acc, tailIdx-1), this.scope.staticDistance(acc, tailIdx-1));
+    public AST staticDistance(Accumulator<Integer> accumulator)  {
+        AST valueEvaluated = this.varValue.staticDistance(accumulator);
+
+        int depthInTree = 0;
+        if (accumulator.data != null){
+            depthInTree=accumulator.data+1;
+        }
+        AST scopeEvaluated = this.scope.staticDistance(new Accumulator<>(this.varName, depthInTree, accumulator));
+
+        return new ASTLet(this.varType, this.varName, valueEvaluated, scopeEvaluated);
     }
 
     @Override
-    public int countNumLets(int count) {
-        return this.scope.countNumLets(count) + 1;
+    public int countNumLetsInAST(int count) {
+        return this.scope.countNumLetsInAST(count) + 1;
     }
 
     @Override
-    public IMeaning valueSD(IMeaning[] acc, int tailIdx) throws Exception {
-        tailIdx--;
-        acc[tailIdx] = this.varValue.valueSD(acc, tailIdx);
-        return this.scope.valueSD(acc, tailIdx);
+    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
+        IMeaning valueEvaluated = this.varValue.valueSD(acc, nextFreeSlot);
+        acc[nextFreeSlot] = valueEvaluated;
+        return this.scope.valueSD(acc, nextFreeSlot-1);
     }
 
     @Override

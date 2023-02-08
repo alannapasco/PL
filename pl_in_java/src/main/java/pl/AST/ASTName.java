@@ -31,29 +31,24 @@ public class ASTName implements AST {
     }
 
     @Override
-    public AST staticDistance(String[] acc, int tailIdx) {
-        for (int i=0; i<acc.length; i++){
-            if (acc[i] != null && acc[i].equals(this.name)){
-                try {
-                    ASTStaticDistanceNode ret = new ASTStaticDistanceNode(i);
-                    acc[i] = null;
-                    return ret;
-                } catch (Exception e){
-                    //i was < 0 (will never occur)
-                    return new ASTError("No SD Found for " + this.name);
-                }
-            }
+    public AST staticDistance(Accumulator<Integer> accumulator) {
+        try {
+            int curDepthInTree = accumulator.data;
+            int depthOfDeclaration = accumulator.get(this.name);
+            int sd = curDepthInTree-depthOfDeclaration;
+            return new ASTStaticDistanceNode(sd);
+        } catch (Exception e) {
+            return new ASTError("No SD Found for " + this.name);
         }
-        return new ASTError("No SD Found for " + this.name);
     }
 
     @Override
-    public int countNumLets(int count) {
+    public int countNumLetsInAST(int count) {
         return count;
     }
 
     @Override
-    public IMeaning valueSD(IMeaning[] acc, int tailIdx) {
+    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) {
         return null;
     }
 

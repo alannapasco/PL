@@ -16,7 +16,7 @@ public class ASTStaticDistanceNode implements AST {
 
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        //call typecheck on the parsed tree before turning it into a SD tree?
+        //call typecheck on the parsed tree before turning it into a SD tree
         throw new Exception("This method is not allowed on SD ASTs");
     }
 
@@ -26,18 +26,18 @@ public class ASTStaticDistanceNode implements AST {
     }
 
     @Override
-    public AST staticDistance(String[] acc, int tailIdx) {
+    public AST staticDistance(Accumulator<Integer> accumulator) {
         return this;
     }
 
     @Override
-    public int countNumLets(int count) {
+    public int countNumLetsInAST(int count) {
         return count;
     }
 
     @Override
-    public IMeaning valueSD(IMeaning[] acc, int tailIdx) {
-        return acc[this.staticDistance];
+    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) {
+        return acc[nextFreeSlot+this.staticDistance+1];
     }
 
     @Override
