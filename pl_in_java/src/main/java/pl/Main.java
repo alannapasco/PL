@@ -27,13 +27,42 @@ public class Main {
     public static void processWithStaticDistance(ArrayList<JsonElement> examples) {
         System.out.println("\n---------- SD AST - Parse -> typecheck -> value results: ----------");
         for (JsonElement example: examples) {
+
+	  // MF : in sw dev, I'd turn the body of this loop into a method 
+
             AST ast = Main.parse(example);
+
+	    // MF : in a "compiler" or "IDE plug-in, you want to run `staticDistance` _after_ type checking 
+
             AST astWithSD = ast.staticDistance(new Accumulator<>());
             System.out.println("OR AST: " + ast + "\nSD AST: " + astWithSD);
 
             try {
                 ast.typeCheck(new Accumulator<>());
-                System.out.println("value:   " + ast.value(new Accumulator<>()));
+		// MF: swdev: narrow the scope of the try .. catch to just this line 
+		//     (because the calls to `value` and `valueSD` do not (yet) raise exns
+		//      and when we get there, we want to know that this is where they came from)
+
+		// MF: factored out this next line so I could use it below:
+		IMeaning actual = ast.value(new Accumulator<>());
+                System.out.println("value:   " + actual);
+
+		/* MF: swdev: 
+		   make a checkOK method, like this: 
+		   void checkOK(AST ast, IMeaning expected) { 
+                     AST astWithSD   = ast.staticDistance(new Accumulator<>());
+                     int numLets     = ast.countNumLetsInAST(0);
+                     IMeaning[] acc  = new IMeaning[numLets];
+		     IMeaning actual = astWithSD.valueSD(acc, numLets-1);
+		     if (!actual.equals(expectec)) {
+		        throw new Exception("bad SD"); // or better
+                     }
+                     return ; 
+                   }
+
+                   call it with `checkOK(ast, actual)` 
+		   when we move on and leave SD behind, comment out this one call 
+		 */
 
                 int numLets = ast.countNumLetsInAST(0);
                 IMeaning[] acc = new IMeaning[numLets];

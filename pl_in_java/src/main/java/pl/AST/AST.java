@@ -4,7 +4,7 @@ import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
 
-/**
+/**  
  AST is a tree-shaped diagram
  AST is one of:
  -bool

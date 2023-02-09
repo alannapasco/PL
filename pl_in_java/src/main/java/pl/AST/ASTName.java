@@ -49,6 +49,7 @@ public class ASTName implements AST {
 
     @Override
     public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) {
+      // MF : okay for here, throw an Exn in the "real world"; you want to know that something went wrong 
         return null;
     }
 
