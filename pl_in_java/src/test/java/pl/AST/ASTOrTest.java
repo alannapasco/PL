@@ -1,7 +1,7 @@
 package pl.AST;
 
 import org.junit.Test;
-import pl.TypePrediction.Type;
+import pl.TypePrediction.VarType;
 
 import static org.junit.Assert.*;
 
@@ -9,10 +9,10 @@ public class ASTOrTest extends ParentTest{
 
     @Test
     public void typeCheck() throws Exception {
-        assertEquals(Type.BOOLEAN, orTT.typeCheck(typeAcc));
-        assertEquals(Type.BOOLEAN, orTF.typeCheck(typeAcc));
-        assertEquals(Type.BOOLEAN, orFT.typeCheck(typeAcc));
-        assertEquals(Type.BOOLEAN, orFF.typeCheck(typeAcc));
+        assertEquals(VarType.BOOLEAN, orTT.typeCheck(typeAcc));
+        assertEquals(VarType.BOOLEAN, orTF.typeCheck(typeAcc));
+        assertEquals(VarType.BOOLEAN, orFT.typeCheck(typeAcc));
+        assertEquals(VarType.BOOLEAN, orFF.typeCheck(typeAcc));
     }
 
     @Test(expected = Exception.class)

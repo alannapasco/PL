@@ -4,6 +4,7 @@ import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
+import pl.TypePrediction.VarType;
 
 
 public class ASTOr implements AST {
@@ -17,9 +18,9 @@ public class ASTOr implements AST {
 
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        if (this.firstVal.typeCheck(accumulator)== Type.BOOLEAN
-                && this.secondVal.typeCheck(accumulator)== Type.BOOLEAN) {
-            return Type.BOOLEAN;
+        if (this.firstVal.typeCheck(accumulator)== VarType.BOOLEAN
+                && this.secondVal.typeCheck(accumulator)== VarType.BOOLEAN) {
+            return VarType.BOOLEAN;
         } else {
             throw new Exception("Type Error");
         }

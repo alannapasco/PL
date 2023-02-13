@@ -4,6 +4,7 @@ import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
 
+
 public class ASTError implements AST {
     final String message;
 

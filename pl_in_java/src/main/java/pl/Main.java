@@ -2,7 +2,7 @@ package pl;
 import com.google.gson.*;
 import pl.AST.*;
 import pl.Meaning.IMeaning;
-import pl.TypePrediction.Type;
+import pl.TypePrediction.VarType;
 import pl.SymbolTable.Accumulator;
 
 import java.util.ArrayList;
@@ -13,11 +13,9 @@ public class Main {
         ArrayList<JsonElement> input = Utils.processJsonExampleSeries("input.json");
         ArrayList<JsonElement> output = Utils.processJsonExampleSeries("output.json");
 
-//        Stream<AST> parsed = input.stream().map(Main::parse);
-//        parsed.forEach(System.out::println);
-
         Utils.testCmp(input, output);
-        Main.processWithStaticDistance(input);
+        Main.process(input);
+        //Main.processWithStaticDistance(input);
     }
 
     /**
@@ -27,48 +25,19 @@ public class Main {
     public static void processWithStaticDistance(ArrayList<JsonElement> examples) {
         System.out.println("\n---------- SD AST - Parse -> typecheck -> value results: ----------");
         for (JsonElement example: examples) {
-
-	  // MF : in sw dev, I'd turn the body of this loop into a method 
-
             AST ast = Main.parse(example);
-
-	    // MF : in a "compiler" or "IDE plug-in, you want to run `staticDistance` _after_ type checking 
-
             AST astWithSD = ast.staticDistance(new Accumulator<>());
             System.out.println("OR AST: " + ast + "\nSD AST: " + astWithSD);
 
             try {
                 ast.typeCheck(new Accumulator<>());
-		// MF: swdev: narrow the scope of the try .. catch to just this line 
-		//     (because the calls to `value` and `valueSD` do not (yet) raise exns
-		//      and when we get there, we want to know that this is where they came from)
-
-		// MF: factored out this next line so I could use it below:
-		IMeaning actual = ast.value(new Accumulator<>());
-                System.out.println("value:   " + actual);
-
-		/* MF: swdev: 
-		   make a checkOK method, like this: 
-		   void checkOK(AST ast, IMeaning expected) { 
-                     AST astWithSD   = ast.staticDistance(new Accumulator<>());
-                     int numLets     = ast.countNumLetsInAST(0);
-                     IMeaning[] acc  = new IMeaning[numLets];
-		     IMeaning actual = astWithSD.valueSD(acc, numLets-1);
-		     if (!actual.equals(expectec)) {
-		        throw new Exception("bad SD"); // or better
-                     }
-                     return ; 
-                   }
-
-                   call it with `checkOK(ast, actual)` 
-		   when we move on and leave SD behind, comment out this one call 
-		 */
+                System.out.println("value:   " + ast.value(new Accumulator<>()));
 
                 int numLets = ast.countNumLetsInAST(0);
                 IMeaning[] acc = new IMeaning[numLets];
                 System.out.println("valueSD: " + astWithSD.valueSD(acc, numLets-1));
             } catch (Exception e) {
-                System.out.println("Error from Main: " + e);
+                System.out.println("Error: " + e);
             }
             System.out.println();
         }
@@ -85,10 +54,9 @@ public class Main {
             System.out.println("AST:   " + ast);
             try {
                 ast.typeCheck(new Accumulator<>());
-                System.out.println("value: " + ast.value(new Accumulator<>()));
+                System.out.println("Value: " + ast.value(new Accumulator<>()));
             } catch (Exception e) {
-                //Type Check failed
-                System.out.println("Invalid Type Example");
+                System.out.println("Error: " + e);
             }
         }
         System.out.println();
@@ -132,11 +100,23 @@ public class Main {
      * Parses an array input of JSONLang
      */
     private static AST parseArray(JsonArray expression) {
-        if (expression.size()==3) {
-            return Main.parseOperation(expression);
-        } else if (expression.get(0).getAsString().equals("let")){
+        String action = "";
+        try {
+            action = expression.get(0).getAsString();
+        } catch (IllegalStateException e) {
+            //
+        }
 
-            return Main.parseVariableAssignment(expression);
+        if (action.equals("let")) {
+            if (expression.get(1).getAsString().equals("var")) {
+                return Main.parseVariableAssignment(expression);
+            } else if (expression.get(1).getAsString().equals("fun")) {
+                return Main.parseFunction(expression);
+            }
+        } else if (action.equals("call")) {
+            return Main.parseFunctionCall(expression);
+        } else if (expression.size()==3) {
+            return Main.parseOperation(expression);
         }
         return new ASTError("Invalid Expression: " + expression + " ");
     }
@@ -170,19 +150,65 @@ public class Main {
      * Parses a variable assignment in JSONLang
      */
     private static AST parseVariableAssignment(JsonArray expression){
-        String varTypeInput = expression.get(1).getAsString();
-        String varName = expression.get(2).getAsString();
-        JsonElement varVal = expression.get(4);
-        JsonElement varScope = expression.get(6);
+        String varTypeInput = expression.get(2).getAsString();
+        String varName = expression.get(3).getAsString();
+        JsonElement varVal = expression.get(5);
+        JsonElement varScope = expression.get(7);
 
-        Type varType;
-        if (varTypeInput.equals("int")){
-            varType = Type.INTEGER;
-        } else if (varTypeInput.equals("bool")) {
-            varType = Type.BOOLEAN;
-        } else {
-            return new ASTError("Invalid Variable Assignment Type: " + expression);
+        VarType varType;
+        try {
+            varType = Main.determineType(varTypeInput);
+        } catch (Exception e) {
+            return new ASTError(e.toString() + expression);
         }
+
         return new ASTLet(varType, varName, Main.parse(varVal), Main.parse(varScope));
     }
+
+
+    /**
+     * Parses a function in JSONlang
+     */
+    private static AST parseFunction(JsonArray expression){
+        String returnTypeStr = expression.get(2).getAsString();
+        String funName = expression.get(3).getAsString();
+        String argTypeStr = expression.get(4).getAsJsonArray().get(0).getAsString();
+        String argName = expression.get(4).getAsJsonArray().get(1).getAsString();
+        JsonElement funVal = expression.get(5);
+        JsonElement funScope = expression.get(7);
+
+        VarType returnType;
+        VarType argType;
+        try {
+            returnType = Main.determineType(returnTypeStr);
+            argType = Main.determineType(argTypeStr);
+        } catch (Exception e) {
+            return new ASTError(e.toString() + expression);
+        }
+        return new ASTFun(returnType, funName, argType, argName, Main.parse(funVal), Main.parse(funScope));
+    }
+
+
+    /**
+     * Parses a function call in JSONlang
+     */
+    private static AST parseFunctionCall(JsonArray expression){
+        String funName = expression.get(1).getAsString();
+        JsonElement funArg = expression.get(2);
+        return new ASTFunCall(funName, Main.parse(funArg));
+    }
+
+    /**
+     * Determines the type
+     */
+    private static VarType determineType(String input) throws Exception {
+        if (input.equals("int")) {
+            return VarType.INTEGER;
+        } else if (input.equals("bool")) {
+            return VarType.BOOLEAN;
+        } else {
+            throw new Exception("Invalid Variable Assignment Type ");
+        }
+    }
+
 }

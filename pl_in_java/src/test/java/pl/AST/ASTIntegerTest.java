@@ -2,7 +2,7 @@ package pl.AST;
 
 import org.junit.Test;
 import pl.Meaning.IntegerRepresentation;
-import pl.TypePrediction.Type;
+import pl.TypePrediction.VarType;
 
 import static org.junit.Assert.*;
 
@@ -10,8 +10,8 @@ public class ASTIntegerTest extends ParentTest{
 
     @Test
     public void typeCheck() throws Exception {
-        assertEquals(one.typeCheck(typeAcc), Type.INTEGER);
-        assertEquals(negfive.typeCheck(typeAcc), Type.INTEGER);
+        assertEquals(one.typeCheck(typeAcc), VarType.INTEGER);
+        assertEquals(negfive.typeCheck(typeAcc), VarType.INTEGER);
     }
 
     @Test

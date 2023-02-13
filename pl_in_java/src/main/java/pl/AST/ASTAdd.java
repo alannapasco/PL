@@ -4,6 +4,7 @@ import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
+import pl.TypePrediction.VarType;
 
 public class ASTAdd implements AST {
     AST firstVal;
@@ -16,9 +17,9 @@ public class ASTAdd implements AST {
 
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        if (this.firstVal.typeCheck(accumulator)== Type.INTEGER
-                && this.secondVal.typeCheck(accumulator)== Type.INTEGER) {
-            return Type.INTEGER;
+        if (this.firstVal.typeCheck(accumulator)== VarType.INTEGER
+                && this.secondVal.typeCheck(accumulator)== VarType.INTEGER) {
+            return VarType.INTEGER;
         } else {
             throw new Exception("Type Error");
         }

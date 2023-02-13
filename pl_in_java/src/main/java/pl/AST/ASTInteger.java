@@ -1,10 +1,10 @@
 package pl.AST;
 
-import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
+import pl.TypePrediction.VarType;
 
 public class ASTInteger implements AST {
     private final int value;
@@ -15,7 +15,7 @@ public class ASTInteger implements AST {
 
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) {
-        return Type.INTEGER;
+        return VarType.INTEGER;
     }
 
     @Override

@@ -3,6 +3,7 @@ import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
+import pl.TypePrediction.VarType;
 
 public class ASTBoolean implements AST {
     final boolean value;
@@ -13,7 +14,7 @@ public class ASTBoolean implements AST {
 
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) {
-        return Type.BOOLEAN;
+        return VarType.BOOLEAN;
     }
 
     @Override

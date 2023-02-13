@@ -67,7 +67,8 @@ public class Utils {
                 continue;
             }
 
-            IMeaning expectedVal = Utils.getExpected(expOutput.get(i-14).getAsJsonPrimitive());
+            int numErrorExamples = 18;
+            IMeaning expectedVal = Utils.getExpected(expOutput.get(i-numErrorExamples).getAsJsonPrimitive());
             if (expectedVal.equals(actualVal) && expectedVal.equals(actualValSD)){
                 System.out.println("Test Passed: " + i);
             } else {

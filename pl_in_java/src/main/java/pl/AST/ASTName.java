@@ -55,6 +55,6 @@ public class ASTName implements AST {
 
     @Override
     public String toString(){
-        return "name:" + this.name;
+        return "var:" + this.name;
     }
 }

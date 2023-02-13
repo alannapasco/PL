@@ -35,18 +35,13 @@ public class ASTLet implements AST{
 
     @Override
     public AST staticDistance(Accumulator<Integer> accumulator)  {
-      // MF: I'd use `sdVarValue` instead 
         AST valueEvaluated = this.varValue.staticDistance(accumulator);
 
-	// MF: (1) I don't understand this logic; (2) I'd write this as if _ then _ else
-	//     why would accumulator.data be null? 
         int depthInTree = 0;
         if (accumulator.data != null){
             depthInTree=accumulator.data+1;
         }
-	// MF : in principle, there is no need to put any value for varName into the accumulator here 
         AST scopeEvaluated = this.scope.staticDistance(new Accumulator<>(this.varName, depthInTree, accumulator));
-
         return new ASTLet(this.varType, this.varName, valueEvaluated, scopeEvaluated);
     }
 
@@ -57,8 +52,6 @@ public class ASTLet implements AST{
 
     @Override
     public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
-      // MF : here `valueEvaluated` is a good name
-      //      it proves that you copied code :-) 
         IMeaning valueEvaluated = this.varValue.valueSD(acc, nextFreeSlot);
         acc[nextFreeSlot] = valueEvaluated;
         return this.scope.valueSD(acc, nextFreeSlot-1);
