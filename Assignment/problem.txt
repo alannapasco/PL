@@ -60,4 +60,11 @@ PROGRAMMING TASKS:
    - Why?
    - This _is_ object-oriented programming in the purest sense.
 
-4. Translate this program into Java and Python. 
+4. Translate this program into Java and Python.
+
+THINKING TASK
+
+5. Why is static scope better than dynamic scope?
+
+   Explain with an example from Java.
+   
