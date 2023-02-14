@@ -23,8 +23,9 @@
     [(_ e ...)
      (define e* (syntax->list #'(e ...)))
      (define js (map json-expression e*))
-     (for-each tc js)
-     #`(#%printing-module-begin #,@js)]))
+     (define ts (map tc js))
+     (define ee (map (λ (t j) [list #'printf "~v : ~a\n" j #`'#,(syntax-e t)]) ts js))
+     #`(#%module-begin #,@ee)]))
 
 (define-syntax-rule (annotate t e) e)
 
@@ -35,11 +36,11 @@
 
   ;; doman types for operators 
   (define-syntax-class primitive
-    (pattern (~literal +)     #:attr type #'int)
-    (pattern (~literal -)     #:attr type #'int)
-    (pattern (~literal ord)   #:attr type #'bool)
-    (pattern (~literal andd)  #:attr type #'bool)
-    (pattern (~literal <)     #:attr type #'bool)))
+    (pattern (~literal +)     #:attr type #'int  #:attr in #'int)
+    (pattern (~literal -)     #:attr type #'int  #:attr in #'int)
+    (pattern (~literal ord)   #:attr type #'bool #:attr in #'bool)
+    (pattern (~literal andd)  #:attr type #'bool #:attr in #'bool)
+    (pattern (~literal <)     #:attr type #'bool #:attr in #'int)))
 
 (define-for-syntax (tc e [env '()])
   (syntax-parse e
@@ -50,59 +51,70 @@
     [(op:primitive left right)
      (define t-left  (tc #'left env))
      (define t-right (tc #'right env))
-     (unless (type-equal? t-left t-right)
-       (raise-syntax-error #false "operator" e (list #'op)))
+     (check e "operator input types" "computed types: " #'op.in t-left t-right)
      #'op.type]
     
     [(let ([x:id (annotate rt (lambda (y:id) ((~literal annotate) at rhs)))]) body)
      (define t-lambda (tc #'rhs (extend #'y #'at env)))
-     (unless (type-equal? t-lambda #'rt)
-       (define msg (~a "let-λ: " #'rt " " t-lambda))
-       (raise-syntax-error #false msg e (list #'rhs)))
+     (check e  "declared return type" "computed return type" #'rt t-lambda)
      (define t-body (tc #'body (extend #'x #'(-> at rt) env)))
      t-body]
     
     [(let ([x:id (annotate rt rhs)]) body)
-     (define t-lambda (tc #'rhs env))
-     (unless (type-equal? t-lambda #'rt)
-       (define msg (~a "declared type: " (syntax-e #'rt) " vs computed type: " (syntax-e t-lambda)))
-       (match-define [list st sx srhs sbody] (syntax-property e 'tsource))
-       (raise-syntax-error #false msg #false #false [list st sx srhs]))
+     (define t-rhs (tc #'rhs env))
+     (check e "declared type:" "computed type:" #'rt t-rhs)
      (define t-body (tc #'body (extend #'x #'rt env)))
      t-body]
 
     [(f:id arg)
-     (define t-fun (lookup #'f env (~v "application function id:  " env " ") e))
+     (define t-fun (lookup #'f env (~a "application function id:  " env " ") e))
      (define t-arg (tc #'arg env))
-     (unless (type-equal? (->-dom t-fun) t-arg)
-       (define msg (~a "call " t-arg " vs " t-fun))
-       (raise-syntax-error #false msg e e))
+     (check e "expected argument type " "actual type: " (->-dom t-fun) t-arg)
      (->-rng t-fun)]
     
     [x (raise-syntax-error #false "type error (no match)" #'x (list #'x))]))
 
+#; {Stx String String TypeStx TypeStx TypeStx *-> Void}
+(define-for-syntax (check e pre post expected-type actual-type . more-types)
+  (unless (apply type-equal? expected-type actual-type more-types)
+    (define a (if (null? more-types) actual-type (cons actual-type more-types)))
+    (define msg (format-msg pre expected-type post a))
+    (raise-syntax-error #false msg #f #f (syntax-property e 'tsource))))
+  
+#; {String TypeStx String TypeStx -> String}
+(define-for-syntax (format-msg pre s post t)
+  (define uu (if (pair? t) (map syntax-e t) (syntax-e t)))
+  (~a pre ": " (syntax-e s) " vs " post ": " uu))
+
+#; {TypeStx -> TypeStx}
 (define-for-syntax (->-dom t)
   (syntax-parse t
     [((~datum ->) dom rng) #'dom]
     [_ #false]))
 
+#; {TypeStx -> TypeStx}
 (define-for-syntax (->-rng t)
   (syntax-parse t
     [((~datum ->) dom rng) #'rng]
     [_ #false]))
 
+#; {SymbolStx TEnv String Stx -> TypeStx}
 (define-for-syntax (lookup x env msg e)
   (define tid (assq (syntax-e x) env))
   (unless tid
     (raise-syntax-error #false msg e (list x)))
   (cadr tid))
 
+#; {SymbolStx TypeStx TEnv -> TEnv}
 (define-for-syntax (extend x v env)
   (define y (syntax-e x))
   (cons [list y v] env))
 
-(define-for-syntax (type-equal? s t)
-  (equal? (syntax-e s) (syntax-e t)))
+#; {TypeStx TypeStx TypeStx *-> Boolean}
+(define-for-syntax (type-equal? s t . u)
+  (cond
+    [(null? u) (equal? (syntax-e s) (syntax-e t))]
+    [else      (and (equal? (syntax-e s) (syntax-e t)) (apply type-equal? t u))]))
 
 ;; ---------------------------------------------------------------------------------------------------
 ;; JSON to Racket conversion 
@@ -130,25 +142,24 @@
     [x:integer #'x]
     [x:boolean #'x]
     [(left ((~datum unquote) op:operator) ((~datum unquote) right))
-     #`(op.op #,(json-expression #'left) #,(json-expression #'right))]
+     (define op #`(op.op #,(json-expression #'left) #,(json-expression #'right)))
+     (syntax-property op 'tsource [list #'left #'op #'right])]
     
     ;; plain let for declaring variables 
     [("let" ((~datum unquote) t:type) ((~datum unquote) x:str) ((~datum unquote) "=")
             ((~datum unquote) rhs)
             ((~datum unquote) "in")
             ((~datum unquote) body))
-     (syntax-property
-      #`(let ([#,(string->identfier #'x) (annotate t.type #,(json-expression #'rhs))])
-          #,(json-expression #'body))
-      'tsource (list #'t #'x #'rhs #'body))]
+     (json-let #'t.type #'x #'rhs #'body)]
+    
     ;; let for a language that also has first-order functions 
     [("let" ((~datum unquote) "var")
             ((~datum unquote) t:type) ((~datum unquote) x:str) ((~datum unquote) "=")
             ((~datum unquote) rhs)
             ((~datum unquote) "in")
             ((~datum unquote) body))
-     #`(let ([#,(string->identfier #'x) (annotate t.type #,(json-expression #'rhs))])
-         #,(json-expression #'body))]
+     (json-let #'t.type #'x #'rhs #'body)]
+    
     ;; varibales 
     [x:string #`#,(string->identfier #'x)]
 
@@ -159,14 +170,26 @@
             ((~datum unquote) rhs)
             ((~datum unquote) "in")
             ((~datum unquote) body))
-     (define y (string->identfier #'x))
-     (define l #`(annotate rt.type (lambda (#,y) (annotate at.type #,(json-expression #'rhs)))))
-     #`(let ([#,(string->identfier #'f) #,l])
-         #,(json-expression #'body))]
+     (json-fun #'rt.type #'f #'at.type #'x #'rhs #'body)]
+    
     [("call" ((~datum unquote) f:str) ((~datum unquote) a))
-     #`(#,(string->identfier #'f) #,(json-expression #'a))]
+     (define a-cal #`(#,(string->identfier #'f) #,(json-expression #'a)))
+     (syntax-property a-cal 'tsource (list #'f #'a))]
    
     [x (raise-syntax-error #false "syntax error (no match)" #'x #f (list #'x))]))
+
+#; {TypeStx StrStx Stx Stx -> Stx + tsource property}
+(define-for-syntax (json-let t x rhs body)
+  (define a-rhs #`(annotate #,t #,(json-expression rhs)))
+  (define a-let #`(let ([#,(string->identfier x) #,a-rhs]) #,(json-expression body)))
+  (syntax-property a-let 'tsource (list t x rhs)))
+
+#; {TypeStx StrStx TypeStx StrStx Stx Stx -> Stx + tsource property}
+(define-for-syntax (json-fun rt f at x rhs body)
+  (define y (string->identfier x))
+  (define l #`(annotate #,rt (lambda (#,y) (annotate #,at #,(json-expression rhs)))))
+  (define a-let #`(let ([#,(string->identfier f) #,l]) #,(json-expression body)))
+  (syntax-property a-let 'tsource (list f x rhs)))
 
 (define (andd x y) (and x y))
 (define (ord x y) (or x y))

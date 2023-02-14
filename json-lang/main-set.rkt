@@ -161,7 +161,7 @@
             ((~datum unquote) body))
      #`(let ([#,(string->identfier #'x) (annotate t.type #,(json-expression #'rhs))])
          #,(json-expression #'body))]
-    [(x:str ((~datum unquote) "=") ((~datum unquote) rhs))
+    [(x:str ((~datum unquote) xxx #;"=") ((~datum unquote) rhs))
      (define y (string->identfier #'x))
      (syntax-property
       #`(begin0 #,y (set! #,y #,(json-expression #'rhs)))
