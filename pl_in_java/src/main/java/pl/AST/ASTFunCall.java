@@ -35,11 +35,15 @@ public class ASTFunCall implements AST {
     @Override
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
         //fetch the closure containing all the required information
+      // MF: this cast is one of those that should never fail ... but again,
+      // Java's type system cannot convey this information from the TC pass to the value pas
         Closure_akaFunctionEvaluationDelayed closure = (Closure_akaFunctionEvaluationDelayed) accumulator.get(this.funName);
 
         //evaluate the value of the given argument
         IMeaning argumentEvaluated = this.funArg.value(accumulator);
 
+	// MF: in the spirit of "introduction" and "elimination", the last line should be in the Closure_akaFun... object
+	// it's called `apply` in traditional terminology .. and you can now see where the "command pattern" comes from
         //evaluate the function body using the given value of the function argument
         return closure.funBody.value(new Accumulator<>(closure.parameterName, argumentEvaluated, closure.environment));
     }
