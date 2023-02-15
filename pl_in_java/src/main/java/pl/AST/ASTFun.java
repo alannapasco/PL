@@ -1,5 +1,6 @@
 package pl.AST;
 
+import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.FunTypePair;
@@ -40,14 +41,8 @@ public class ASTFun implements AST {
 
     @Override
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        //get the argument
-        IMeaning givenArgValue = this.scope.value(accumulator);
-
-        //combine the argName with the givenArgValue in the accumulator
-        Accumulator<IMeaning> accWithArg = new Accumulator<>(this.argName, givenArgValue, accumulator);
-
-        //Get the value of this function's body
-        return this.funBody.value(accWithArg);
+        IMeaning closure = new Closure_akaFunctionEvaluationDelayed(this.funBody, this.argName, accumulator);
+        return this.scope.value(new Accumulator<>(this.funName, closure, accumulator));
     }
 
     @Override

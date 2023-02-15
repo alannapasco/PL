@@ -104,5 +104,29 @@
 	],
 	[
 		"let","var","int","x","=",5,"in",["let","fun","int","f",["int","y"],["x","+","y"],"in",["let","var","int","x","=",42,"in",["call","f",10]]]
+	],
+	["let", "fun", "int", "g", ["int", "y"], ["y","+", 32],
+		"in",
+		["call", "g", 10 ]
+	],
+	["let", "var", "int", "x", "=", 5,
+		"in",
+		["let", "fun", "int", "f", ["int", "y"], ["x", "+", "y"],
+			"in",
+			["call", "f", 10 ]]
+	],
+	["let", "var", "int", "x", "=", 5,
+		"in",
+		["let", "fun", "int", "f", ["int", "x"], ["x", "+", ["x", "+", 10]],
+			"in",
+			["call", "f", "x" ]]
+	],
+	["let", "var", "int", "x", "=", 5,
+		"in",
+		["let", "fun", "int", "f", ["int", "y"], ["x", "+", "y"],
+			"in",
+			["let", "var", "int", "x", "=", 42,
+				"in",
+				[["call", "f", "x" ], "+", ["call", "f", "x" ]]]]
 	]
 ]

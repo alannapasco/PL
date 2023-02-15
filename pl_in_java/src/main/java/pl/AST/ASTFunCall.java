@@ -1,11 +1,10 @@
 package pl.AST;
 
+import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
-import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.FunTypePair;
 import pl.TypePrediction.Type;
-import pl.TypePrediction.VarType;
 
 public class ASTFunCall implements AST {
     String funName;
@@ -35,8 +34,14 @@ public class ASTFunCall implements AST {
 
     @Override
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        //funArg As IMeaning
-        return this.funArg.value(accumulator);
+        //fetch the closure containing all the required information
+        Closure_akaFunctionEvaluationDelayed closure = (Closure_akaFunctionEvaluationDelayed) accumulator.get(this.funName);
+
+        //evaluate the value of the given argument
+        IMeaning argumentEvaluated = this.funArg.value(accumulator);
+
+        //evaluate the function body using the given value of the function argument
+        return closure.funBody.value(new Accumulator<>(closure.parameterName, argumentEvaluated, closure.environment));
     }
 
     @Override

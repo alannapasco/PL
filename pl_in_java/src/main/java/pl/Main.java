@@ -16,6 +16,7 @@ public class Main {
         Utils.testCmp(input, output);
         Main.process(input);
         //Main.processWithStaticDistance(input);
+
     }
 
     /**
