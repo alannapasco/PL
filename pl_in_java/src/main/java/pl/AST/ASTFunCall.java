@@ -50,6 +50,7 @@ public class ASTFunCall implements AST {
 
     @Override
     public AST staticDistance(Accumulator<Integer> accumulator) {
+      // MF: throw an `RuntimeException` instead, the ones that are _not_ declared and type-checked.
         return null;
     }
 
@@ -60,6 +61,7 @@ public class ASTFunCall implements AST {
 
     @Override
     public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
+      // MF: throw an `RuntimeException` instead, the ones that are _not_ declared and type-checked.
         return null;
     }
 
