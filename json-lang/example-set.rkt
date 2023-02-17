@@ -1,5 +1,22 @@
 #lang json-lang
 
+
+;; a function for setting an int var to a new value 
+["let", "var", "int", "x", "=", 1, "in",
+      ["let", "fun", "int", "setx", ["int", "nu"], ["x","=","nu"], "in",
+            ["let", "var", "int", "_", "=", ["call","setx",2], "in",
+                  "x"]]]
+
+;; a functionn for setting a bool var to a new value
+["let", "var", "bool", "x", "=", #true, "in",
+      ["let", "fun", "bool", "setx", ["bool", "nu"], ["x","=","nu"], "in",
+            ["let", "var", "bool", "_", "=", ["call","setx",2], "in",
+                  "x"]]]
+            
+            
+
+
+;; ---------------------------------------------------------------------------------------------------
 ;; a simple assignment, returns the original value of 
 ["let", "var", "int", "x", "=", 1,
       "in",
