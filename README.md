@@ -11,12 +11,14 @@ Language Concepts, Language Features
   - developer-facing: why is "static scope" better than "dynamic scope"
 - assignment statements, call-by-value 
   - simply typed variables only 
-  - the programs still terminate 
-- recursive functions vs loops (measured)
+- the programs still terminate 
+
+- higher-order and recursive functions, more types 
+  - recursion from assignment *
   - programs may diverge, but the type checker will terminate
-  - syntactic abbreviations?
-- higher-order functions, more types 
-  - recursion from assignment 
+
+- conditionals and loops,
+  recursive functions vs loops (measured)
 
 - specification vs implementation; "meta" properties 
   - duality of language features: introduction, elimination
@@ -45,6 +47,8 @@ More Language Features (?)
 
   - objects -- what's a higher-order function? (JavaScript, pure)
   - classes -- object as instance (Java) 
+
+  - syntactic abbreviations?
 
 Meta Interpretation Obscures True Meaning
 -----------------------------------------

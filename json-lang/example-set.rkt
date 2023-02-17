@@ -10,7 +10,7 @@
 ;; a functionn for setting a bool var to a new value
 ["let", "var", "bool", "x", "=", #true, "in",
       ["let", "fun", "bool", "setx", ["bool", "nu"], ["x","=","nu"], "in",
-            ["let", "var", "bool", "_", "=", ["call","setx",2], "in",
+            ["let", "var", "bool", "_", "=", ["call","setx",#false], "in",
                   "x"]]]
             
             

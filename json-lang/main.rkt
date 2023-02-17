@@ -84,11 +84,13 @@
      t]
      
     [(f:id arg)
-     (define t-fun (lookup #'f env (~v "application function id:  " env " ") e))
-     (define t-arg (tc #'arg env))
-     (unless (type-equal? (->-dom t-fun) t-arg)
-       (define msg (~a "call " t-arg " vs " t-fun))
-       (raise-syntax-error #false msg e e))
+     (define t-fun  (lookup #'f env (~v "application function id:  " env " ") e))
+     (define t-arg  (tc #'arg env))
+     (define domain (->-dom t-fun))
+     (unless (type-equal? domain t-arg)
+       (define msg (~a "expected type: " (syntax-e domain) " vs computed type: " (syntax-e t-arg)))
+       (match-define [list sf sa] (syntax-property e 'tsource))
+       (raise-syntax-error #false msg #false #false (list sf sa)))
      (->-rng t-fun)]
     
     [x (raise-syntax-error #false "type error (no match)" #'x (list #'x))]))
@@ -182,7 +184,9 @@
      #`(let ([#,(string->identfier #'f) #,l])
          #,(json-expression #'body))]
     [("call" ((~datum unquote) f:str) ((~datum unquote) a))
-     #`(#,(string->identfier #'f) #,(json-expression #'a))]
+     (syntax-property
+      #`(#,(string->identfier #'f) #,(json-expression #'a))
+      'tsource (list #'f #'a))]
    
     [x (raise-syntax-error #false "syntax error (no match)" #'x #f (list #'x))]))
 
