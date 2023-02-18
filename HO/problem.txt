@@ -1,0 +1,87 @@
+
+Higher-Order and Recursion Problem
+
+Here is a JSON grammar that adds simple functions to our language: 
+
+  Var JSON (HOJSON) is one of:
+   -- true
+   -- false
+   -- [HOJSON, "^",  HOJSON]
+   -- [HOJSON, "&&", HOJSON]
+   -- [HOJSON, ">",  HOJSON]
+   -- Integer (small ones)
+   -- [HOJSON, "-",  HOJSON]
+   -- [HOJSON, "+",  HOJSON]
+   -- Name                                        
+   -- ["let", "var", Type, Name, "=", HOJSON, "in", HOJSON]
+   -- ["let", "fun", Type, Name, [Type, Name], HOJSON, "in", HOJSON]
+   -- ["call", Name, HOJSON]	 		
+   -- ["set", Name, HOJSON]
+
+   Name is a (simple) String (no JSON tricks).
+
+   Type is one of:
+   -- "int"
+   -- "bool"
+
+   ;; new type expressions:
+
+   -- [Type, "->", Type]
+
+INTERPRETATION
+
+ [d, "->", r] is a (declared) type for a function from d to r
+
+ Practically speaking, HOJSON programmers can write expressions whose
+ result is a function.  
+
+PROGRAMMING TASKS, set 1: 
+
+1. Revise the parser to accept HOJSON.
+2. Revise the type checker as needed. 
+3. Revise the `value` function as needed.
+
+   NOTE Make `main` print "closure" (JSON string) when
+   the result is a Closure_akaFunctionEvaluationDelayed.
+   
+4*. Write a function that runs forever. 
+
+PROGRAMMING TASKS, set 2:
+
+Let's make function declarations recursive: 
+
+"""
+   ;; revised expressions:
+   -- ["let", "fun", Type, Name, [Type, Name], HOJSON, "in", HOJSON]
+"""
+
+INTERPRETATION
+
+ ["let", "fun", rt, f, [at, a], e, "in", s]
+
+is a declaration of function `f` that can be called in `e` and scope
+`s`.  The type of `a` in `e` is `at`, and the type of `f` in `e` is
+(the type AST for) [at, "->, rt] -- just like in `s`. 
+
+This makes `f` recursive and demands two changes:
+
+5. Revise the type checker to ensure `f` is used properly in `e`.
+6**. Revise the value function to realize recursion.
+7. Without "if", recursive functions aren't particularly
+   interesting. But it is now trivial to write an infinite loop
+   -- which wasn't possible to do before.
+
+8. Write an HOJSON function "setx" to update the "x" in the following
+   program to a new value: 
+
+```
+;; a function for setting an int var to a new value 
+["let", "var", ...", "x", "=", ..., "in",
+      ["let", "fun", "int", "setx", ... , ..., "in"
+            ["let", "var", t", "_", "=", ["call","setx", ...], "in",
+                  "x"]]]
+```
+
+   Do this for t as "int", "bool", and ["int", "->", "bool"]. 
+
+   Should a working developer be disturbed?
