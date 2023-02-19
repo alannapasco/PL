@@ -25,7 +25,8 @@ exec racket -tm "$0" -- ${1+"$@"}
   (cond [(eof-object? input) (void)] [else (write-json (pipe input)) (newline)]))
 
 (define-type Meaning (U Boolean Integer Closure))
-(define-type Closure [List Symbol AST MEnv])
+[struct closure [{param : Symbol} {body : AST} {env : MEnv}] #:mutable #:type-name Closure]
+; (define-type Closure [List Symbol AST MEnv])
 (define-type MEnv    [Env (Boxof Meaning)])
 
 (: pipe (JSExpr -> JSExpr))
@@ -216,36 +217,32 @@ exec racket -tm "$0" -- ${1+"$@"}
 
     [`(let ,t ,x ,rhs ,body) (value body (env-add env x [box (value rhs env)]))]
     [`(set ,x ,rhs)
-     (define m (env-retrieve env x "can't happen (variable undefined) ~a" create-closure-on-retrieve))
+     (define m (env-retrieve env x "can't happen (variable undefined) ~a"))
      (define o (unbox m))
      (set-box! m (value rhs env))
      o]
     [(? symbol? x)
-     (unbox (env-retrieve env x "can't happen (variable undefined) ~a" create-closure-on-retrieve))]
+     (unbox (env-retrieve env x "can't happen (variable undefined) ~a"))]
 
     [`(fun ,t ,f ,x ,rhs ,body)
-     (define c (create-closure x rhs env))
-     (define e ([inst env-rec [Boxof Meaning]] env f (box c)))
-     (value body e)]
+     (value body (create-rec-env f x rhs env))]
     [`(cal ,f ,a)
-     (define v (env-retrieve env f "can't happen (function undefined) ~a" create-closure-on-retrieve))
+     (define v (env-retrieve env f "can't happen (function undefined) ~a"))
      (define c (unbox v))
      (closure-apply (ccast c) (value a env))]))
 
-(: create-closure (-> Symbol AST MEnv Closure))
-(define (create-closure x rhs env)
-  (list x rhs env))
-
-(: create-closure-on-retrieve (-> Symbol [Boxof Meaning] MEnv [Boxof Meaning]))
-(define (create-closure-on-retrieve f cl env)
-  (match-define [list x rhs _] (ccast (unbox cl)))
-  (set-box! cl (list x rhs (env-rec env f cl)))
-  cl)
+(: create-rec-env (-> Symbol Symbol AST MEnv MEnv))
+;; creates a cyclic environment at `f` through `[closure x rhs .]` 
+(define (create-rec-env f x rhs env)
+  (define b : [Boxof Meaning] (box (closure x rhs env)))
+  (define e (env-add env f b))
+  (set-box! b (closure x rhs e))
+  e)
 
 (: closure-apply (-> Closure Meaning Meaning))
 (define (closure-apply c a)
   (match c
-    [`(,x ,rhs ,env) (value rhs (env-add env x (box a)))]
+    [(closure x rhs env) (value rhs (env-add env x (box a)))]
     [_ (error 'c-apply "can't happen: ~a\n" c)]))
 
 ;; -----------------------------------------------------------------------------
