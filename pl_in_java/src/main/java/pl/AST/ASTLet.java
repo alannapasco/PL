@@ -52,6 +52,7 @@ public class ASTLet implements AST{
         AST valueEvaluated = this.varValue.staticDistance(accumulator);
 
         int depthInTree = 0;
+	// MF: use `isEmpty()` instead. 
         if (accumulator.data != null){
             depthInTree=accumulator.data+1;
         }

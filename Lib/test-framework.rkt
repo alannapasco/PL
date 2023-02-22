@@ -19,8 +19,7 @@
   (with-handlers ([handle? void])
     (define-values [record-in record-out] (make-record))
     (define in-json (jsexpr->string (record-in in)))
-    (define actual  (record-out (string->jsexpr (redirect main in-json))))
-    (check-equal? actual expected msg)))
+    (check-equal? (record-out (string->jsexpr (redirect main in-json))) expected msg)))
 
 (: make-record (-> (Values (JSExpr -> JSExpr) (JSExpr -> JSExpr))))
 ;; make two recording functions, one for input and one for output (*counter)
