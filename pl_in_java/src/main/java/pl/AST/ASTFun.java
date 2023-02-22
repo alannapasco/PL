@@ -29,11 +29,9 @@ public class ASTFun implements AST {
 
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-      // MF: typeCheck does _not_ evaluate but _check_ so "evaluated" --> "checked" 
-        //verify that the body evaluated with the given argument returns the proper return type
+        //verify that the body type checked with the given argument returns the proper return type
         Type argTypeVerified = funBody.typeCheck(new Accumulator<>(this.argName, this.argType, accumulator));
         if (!argTypeVerified.equals(returnType)) {
-	  // MF: you wrote that typeCheck doesn't raise exn. Hm :-) 
             throw new Exception("Type Error - Function body does not evaluate to the correct return type");
         }
 

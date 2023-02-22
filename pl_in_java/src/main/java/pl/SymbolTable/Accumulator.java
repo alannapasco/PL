@@ -27,4 +27,15 @@ public class Accumulator<T> {
             return this.rest.get(name);
         }
     }
+
+    public void update(String name, T newElement) throws Exception {
+        if (this.data == null || this.rest == null) {
+            throw new Exception("End of Table");
+        }
+        if (this.name.equals(name)) {
+            this.data = newElement;
+        } else {
+            this.rest.update(name, newElement);
+        }
+    }
 }

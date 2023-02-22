@@ -45,7 +45,7 @@ public class ASTFunCall implements AST {
 	// MF: in the spirit of "introduction" and "elimination", the last line should be in the Closure_akaFun... object
 	// it's called `apply` in traditional terminology .. and you can now see where the "command pattern" comes from
         //evaluate the function body using the given value of the function argument
-        return closure.funBody.value(new Accumulator<>(closure.parameterName, argumentEvaluated, closure.environment));
+        return closure.apply(argumentEvaluated);
     }
 
     @Override

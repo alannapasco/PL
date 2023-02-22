@@ -49,6 +49,9 @@
 	[
 		"let","fun","int","not-name",["int","y"],["y","-","1"],"in",["call","name",10]
 	],
+	[
+		"asdf", "=", true
+	],
 	true,
 	false,
 	"true",
@@ -128,5 +131,23 @@
 			["let", "var", "int", "x", "=", 42,
 				"in",
 				[["call", "f", "x" ], "+", ["call", "f", "x" ]]]]
-	]
+	],
+	[
+		"let","var","int","x","=",5, "in",["x", "=", ["x", "+", 1]]
+	],
+	[
+		"let","var","int","x","=",5, "in", ["let","var","int","y","=", ["x", "=", ["x", "+", 1]], "in", "y"]
+	],
+	["let","var","int","x","=",5,
+		"in",["let","fun","int","f",["int","y"],["let","var","int","z","=",["y","=",0],
+		"in",["x","+","y"]],
+		"in",["let","var","int","x","=",42,
+			"in",["call","f","x"]]]],
+	["let","var","int","x","=",5,
+		"in",["let","fun","int","f",["int","y"],["x","+","y"],
+		"in",["let","var","int","x","=",42,
+			"in",["call","f",
+				["let","var","int","_","=",["x","=",["x","+",1]],
+					"in","x"]]]]]
+
 ]

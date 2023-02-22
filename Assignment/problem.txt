@@ -19,7 +19,7 @@ Here is a JSON grammar that adds simple functions to our language:
 
    ;; new expressions:
 
-   -- ["set", Name, AJSON]
+   -- [Name, "=", AJSON]
 
    Type is one of:
    -- "int"
@@ -40,31 +40,6 @@ PROGRAMMING TASKS:
 2. Revise the type checker to check the suitably extended AST.
 3. Revise the `value` function to consume instance of the revised AST. 
 
-   This one is tricky and we need to talk about it.
 
-   What should the Meaning be of the following expression:
 
-   ["let", "var", "int", "x", "=", 5,
-    "in",
-         [["let", "fun", "int", "f", ["int", "y"], ["set", "x", "y"]
-	   "in",
-	         ["let", "var", "int", "x", "=", 42,
-	 	  "in",
-		       [["call", "f", 10 ],
-		        "+",
-		        [["call", "f", 20 ]]]]]
-           "+",
-	   "x"]]
-			
-   - 15?
-   - Why?
-   - This _is_ object-oriented programming in the purest sense.
 
-4. Translate this program into Java and Python.
-
-THINKING TASK
-
-5. Why is static scope better than dynamic scope?
-
-   Explain with an example from Java.
-   

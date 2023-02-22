@@ -1,5 +1,6 @@
 package pl.AST;
 
+import pl.Meaning.EnvironmentUpdateDelayed;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
@@ -30,7 +31,20 @@ public class ASTLet implements AST{
     @Override
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
         IMeaning valueEvaluated = this.varValue.value(accumulator);
-        return this.scope.value(new Accumulator<>(this.varName, valueEvaluated, accumulator));
+
+        if (valueEvaluated instanceof EnvironmentUpdateDelayed asEUD) {
+            //Effect: updates the node representing the variable that was updated with the new value
+            accumulator.update(asEUD.nameOfValueToUpdate, asEUD.newValue);
+            valueEvaluated = asEUD.newValue;
+        }
+
+        IMeaning result = this.scope.value(new Accumulator<>(this.varName, valueEvaluated, accumulator));
+
+        if (result instanceof EnvironmentUpdateDelayed rasEUD) {
+            return rasEUD.newValue;
+        } else {
+            return result;
+        }
     }
 
     @Override

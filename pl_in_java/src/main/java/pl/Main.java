@@ -89,11 +89,9 @@ public class Main {
             if (element.getAsBoolean() || element.getAsString().equals("false")) {
                 return new ASTBoolean(element.getAsBoolean());
             } else {
-                //here we have a String, which at the moment only represents the name of a variable (bc we dont yet have strings in this language)
                 return new ASTName(element.getAsString());
             }
         }
-        //return new ASTError("Invalid Primitive: " + element + " ");
     }
 
 
@@ -141,6 +139,8 @@ public class Main {
                 return new ASTSub(parse(firstVal), parse(secondVal));
             case "+":
                 return new ASTAdd(parse(firstVal), parse(secondVal));
+            case "=":
+                return new ASTSet(firstVal.getAsString(), parse(secondVal));
             default:
                 return new ASTError("Invalid Operator in expression: " + operationExpression + " ");
         }
