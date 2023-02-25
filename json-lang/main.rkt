@@ -3,6 +3,7 @@
 ;; a primitive implementation of json-lang that 
 
 (provide
+ true false 
  (rename-out [mb #%module-begin]
              [ti #%top-interaction])
  #%datum)
@@ -22,9 +23,12 @@
   (syntax-parse stx 
     [(_ e ...)
      (define e* (syntax->list #'(e ...)))
-     (define js (map json-expression e*))
+     (define uu (map unwrap e*))
+     (define js (map json-expression uu))
      (define ts (map tc js))
-     (define ee (map (λ (t j) [list #'printf "~v : ~a\n" j #`'#,(syntax-e t)]) ts js))
+     (define ee (map (λ (t j) [list #'printf "~v : ~a\n" j #`'#,(type->datum t)]) ts js))
+     #;
+     (eprintf "type checking done: ~a\n" (map type->datum ts))
      #`(#%module-begin #,@ee)]))
 
 (define-syntax-rule (annotate t e) e)
@@ -55,8 +59,8 @@
        (check e "operator input types" "computed types: " #'op.in t-left t-right)
        #'op.type]
     
-      [(let ([x:id (annotate rt (lambda (y:id) ((~literal annotate) at rhs)))]) body)
-       (define t-lambda (tc #'rhs (extend #'y #'at env)))
+      [(letrec ([x:id (annotate rt (lambda (y:id) ((~literal annotate) at rhs)))]) body)
+       (define t-lambda (tc #'rhs (extend #'x #'(-> at rt) (extend #'y #'at env))))
        (check e  "declared return type" "computed return type" #'rt t-lambda)
        (define t-body (tc #'body (extend #'x #'(-> at rt) env)))
        t-body]
@@ -92,20 +96,20 @@
   
 #; {String TypeStx String TypeStx -> String}
 (define-for-syntax (format-msg pre s post t)
-  (define uu (if (pair? t) (map syntax-e t) (syntax-e t)))
-  (~a pre ": " (syntax-e s) " vs " post ": " uu))
+  (define uu (type->datum t) #;(if (pair? t) (syntax-e t) (syntax-e t)))
+  (~a pre ": " (type->datum s) " vs " post ": " uu))
 
 #; {TypeStx -> TypeStx}
 (define-for-syntax (->-dom t)
   (syntax-parse t
     [((~datum ->) dom rng) #'dom]
-    [_ #false]))
+    [_ (error '->-dom "can't happen")]))
 
 #; {TypeStx -> TypeStx}
 (define-for-syntax (->-rng t)
   (syntax-parse t
     [((~datum ->) dom rng) #'rng]
-    [_ #false]))
+    [_ (error '->-rng "can't happen")]))
 
 #; {SymbolStx TEnv String Stx -> TypeStx}
 (define-for-syntax (lookup x env msg e)
@@ -122,8 +126,14 @@
 #; {TypeStx TypeStx TypeStx *-> Boolean}
 (define-for-syntax (type-equal? s t . u)
   (cond
-    [(null? u) (equal? (syntax-e s) (syntax-e t))]
+    [(null? u) (equal? (type->datum s)  (type->datum t))]
     [else      (and (equal? (syntax-e s) (syntax-e t)) (apply type-equal? t u))]))
+
+#; {TypeStx -> TypeDatum}
+(define-for-syntax (type->datum t)
+  (syntax-parse t
+    [((~datum ->) at rt) (list '-> (type->datum #'at) (type->datum #'rt))]
+    [x (syntax-e #'x)]))
 
 ;; ---------------------------------------------------------------------------------------------------
 ;; JSON to Racket conversion 
@@ -142,35 +152,26 @@
   (define-syntax-class type
     (pattern "int"  #:attr type #'int)
     (pattern "bool" #:attr type #'bool)
-    ;; this last one will be needed for higher-order functions 
-    #;
-    (pattern ((~datum '->) a:type b:type) #:attr type #`(-> #,#'a.type #,#'b.type))))
+    (pattern (a:type (~datum "->") b:type) #:attr type #`(-> #,#'a.type #,#'b.type))))
 
 (define-for-syntax (json-expression stx)
   (syntax-parse stx
-    [x:integer #'x]
-    [x:boolean #'x]
-    [(left ((~datum unquote) op:operator) ((~datum unquote) right))
+    [x:integer #'x] [(~literal true) #'#t]
+    [x:boolean #'x] [(~literal false) #'#f]
+    [(left op:operator right)
      (define op #`(op.op #,(json-expression #'left) #,(json-expression #'right)))
      (syntax-property op 'tsource [list #'left #'op #'right])]
     
     ;; plain let for declaring variables 
-    [("let" ((~datum unquote) t:type) ((~datum unquote) x:str) ((~datum unquote) "=")
-            ((~datum unquote) rhs)
-            ((~datum unquote) "in")
-            ((~datum unquote) body))
+    [("let" t:type x:str "=" rhs "in" body)
      (json-let #'t.type #'x #'rhs #'body)]
     
     ;; let for a language that also has first-order functions 
-    [("let" ((~datum unquote) "var")
-            ((~datum unquote) t:type) ((~datum unquote) x:str) ((~datum unquote) "=")
-            ((~datum unquote) rhs)
-            ((~datum unquote) "in")
-            ((~datum unquote) body))
+    [("let" "var" t:type x:str "=" rhs "in" body)
      (json-let #'t.type #'x #'rhs #'body)]
 
     ;; assignment statement 
-    [(x:str ((~datum unquote) "=") ((~datum unquote) rhs))
+    [(x:str "=" rhs)
      (define y (string->identfier #'x))
      (define a #`(begin0 #,y (set! #,y #,(json-expression #'rhs))))
      (syntax-property a 'tsource (list #'x #'rhs))]
@@ -179,15 +180,10 @@
     [x:string #`#,(string->identfier #'x)]
 
     ;; let for declaring functions 
-    [("let" ((~datum unquote) "fun")
-            ((~datum unquote) rt:type) ((~datum unquote) f:str)
-            ((~datum unquote) [at:type ((~datum unquote) x:str)])
-            ((~datum unquote) rhs)
-            ((~datum unquote) "in")
-            ((~datum unquote) body))
+    [("let" "fun" rt:type f:str [at:type x:str] rhs "in" body)
      (json-fun #'rt.type #'f #'at.type #'x #'rhs #'body)]
     
-    [("call" ((~datum unquote) f:str) ((~datum unquote) a))
+    [("call" f:str a)
      (define a-cal #`(#,(string->identfier #'f) #,(json-expression #'a)))
      (syntax-property a-cal 'tsource (list #'f #'a))]
    
@@ -203,7 +199,7 @@
 (define-for-syntax (json-fun rt f at x rhs body)
   (define y (string->identfier x))
   (define l #`(annotate #,rt (lambda (#,y) (annotate #,at #,(json-expression rhs)))))
-  (define a-let #`(let ([#,(string->identfier f) #,l]) #,(json-expression body)))
+  (define a-let #`(letrec ([#,(string->identfier f) #,l]) #,(json-expression body)))
   (syntax-property a-let 'tsource (list f x rhs)))
 
 (define (andd x y) (and x y))
@@ -218,25 +214,38 @@
   (syntax-parse stx
     [(_ . form) (json-expression #'form)]))
 
+;; ---------------------------------------------------------------------------------------------------
+;; remove JSON commas from input 
+
+(define-for-syntax (unwrap stx)
+  (syntax-parse stx
+    [(x ((~datum unquote) y) . z) #`(#,(unwrap #'x) #,(unwrap #'y) .  #,(unwrap #'z))]
+    [((~datum unquote) y) (unwrap #'y)]
+    [(((~datum unquote) y)) (list (unwrap #'y))]
+    [z #'z]))
+
 ;; -------
 
 (begin-for-syntax
   (module+ test
-    (printf "~a\n" (tc (json-expression #'10)))
+    (unwrap '["let", "var", "int", "x", "=", (10, "+", 5),
+                   "in",
+                   "x"])
 
-    (printf "~a\n" (tc (json-expression #'(10, "+", 5))))
+    9999999
 
-    (printf "~a\n" 
-            (tc (json-expression
-                 #'["let", "var", "int", "x", "=", (10, "+", 5),
-                         "in",
-                         "x"])))
+    (define (f x)
+      (define u (unwrap x))
+      (define j (json-expression u))
+      (define t (tc j))
+      (printf "~a\n" t))
 
-    (printf "~a\n" 
-            (tc
-             (json-expression
-              #'["let", "int", "y", "=", 42,
+    (f #'10)
+    (f #'(10, "+", 5))
+    (f #'["let", "var", "int", "x", "=", (10, "+", 5),
+                          "in",                         "x"])
+    (f #'["let", "int", "y", "=", 42,
                       "in",
                       ["let", "int", "x", "=", (10, "+", 5),
                             "in",
-                            "y"]])))))
+                            "y"]])))
