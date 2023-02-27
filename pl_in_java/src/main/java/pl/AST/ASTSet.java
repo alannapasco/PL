@@ -1,6 +1,5 @@
 package pl.AST;
 
-import pl.Meaning.EnvironmentUpdateDelayed;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.Type;
@@ -27,7 +26,7 @@ public class ASTSet implements AST {
 
     @Override
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        return new EnvironmentUpdateDelayed(this.varName, this.newVal.value(accumulator));
+        return accumulator.update(this.varName, this.newVal.value(accumulator));
     }
 
     @Override

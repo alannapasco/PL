@@ -42,14 +42,16 @@ public class Accumulator<T> {
         }
     }
 
-    public void update(String name, T newElement) throws Exception {
+    public T update(String name, T newElement) throws Exception {
         if (this.data == null || this.rest == null) {
             throw new Exception("End of Table");
         }
         if (this.name.equals(name)) {
+            T temp = this.data;
             this.data = newElement;
+            return temp;
         } else {
-            this.rest.update(name, newElement);
+            return this.rest.update(name, newElement);
         }
     }
 }

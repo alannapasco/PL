@@ -7,6 +7,12 @@ public class Closure_akaFunctionEvaluationDelayed implements IMeaning {
     private final String parameterName;
     private final Accumulator<IMeaning> environment;
 
+    public Closure_akaFunctionEvaluationDelayed(){
+        this.funBody = null;
+        this.parameterName = null;
+        this.environment = null;
+    }
+
     // "introduction" / "create"
     public Closure_akaFunctionEvaluationDelayed(AST funBody, String parameter, Accumulator<IMeaning> environment) {
         this.funBody = funBody;
@@ -14,14 +20,12 @@ public class Closure_akaFunctionEvaluationDelayed implements IMeaning {
         this.environment = environment;
     }
 
-    /**
-     * "Elimination" / "use"
-     * evaluates the function
-     * @param argumentEvaluated
-     * @return
-     * @throws Exception
-     */
     public IMeaning apply(IMeaning argumentEvaluated) throws Exception {
         return this.funBody.value(new Accumulator<>(this.parameterName, argumentEvaluated, this.environment));
+    }
+
+    @Override
+    public String toString(){
+        return "Closure Body: " + funBody;
     }
 }

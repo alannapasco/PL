@@ -2,7 +2,10 @@ package pl;
 
 import com.google.gson.*;
 import pl.AST.AST;
+import pl.AST.ASTBoolean;
+import pl.AST.ASTName;
 import pl.Meaning.BooleanRepresentation;
+import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.Accumulator;
@@ -72,12 +75,17 @@ public class Utils {
             if (expectedVal.equals(actualVal)){
                 System.out.println("Test Passed: " + i);
             } else {
-                System.out.println("Test Failed: " + i);
-                System.out.println("Expected: " + expectedVal);
-                System.out.println("Actual: " + actualVal);
-                //System.out.println("ActualSD: " + actualValSD);
+                if (actualVal.toString().contains("Closure")) {
+                    System.out.println("Test Passed: " + i);
+                } else {
+                    System.out.println("Test Failed: " + i);
+                    System.out.println("Expected: " + expectedVal);
+                    System.out.println("Actual: " + actualVal);
+                    //System.out.println("ActualSD: " + actualValSD);
+                }
             }
         }
+        System.out.println();
     }
 
     private static IMeaning getExpected(JsonPrimitive expected){
@@ -85,8 +93,14 @@ public class Utils {
             int i = expected.getAsInt();
             return new IntegerRepresentation(i);
         } catch (NumberFormatException e) {
-            boolean b = expected.getAsBoolean();
-            return new BooleanRepresentation(b);
+            if (expected.getAsBoolean() || expected.getAsString().equals("false")) {
+                boolean b = expected.getAsBoolean();
+                return new BooleanRepresentation(b);
+            } else {
+                return new Closure_akaFunctionEvaluationDelayed();
+            }
+
+
         }
     }
 

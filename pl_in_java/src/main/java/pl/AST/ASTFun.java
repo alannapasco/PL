@@ -2,6 +2,7 @@ package pl.AST;
 
 import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
+import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.FunTypePair;
 import pl.TypePrediction.Type;
@@ -29,20 +30,29 @@ public class ASTFun implements AST {
 
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        //verify that the body type checked with the given argument returns the proper return type
-        Type argTypeVerified = funBody.typeCheck(new Accumulator<>(this.argName, this.argType, accumulator));
-        if (!argTypeVerified.equals(returnType)) {
-            throw new Exception("Type Error - Function body does not evaluate to the correct return type");
+        Type funTypePair = new FunTypePair(this.argType, this.returnType);
+        Accumulator<Type> environmentWithThisFunc = new Accumulator<>(this.funName, funTypePair, accumulator);
+
+        Type retTypeVerified = this.funBody.typeCheck(new Accumulator<>(this.argName, this.argType, environmentWithThisFunc));
+        if (!retTypeVerified.equals(returnType)) {
+            throw new Exception("Type Error - Function body " + this.funBody + " does not evaluate to the correct return type " + this.returnType);
         }
 
-        Type funTypePair = new FunTypePair(this.argType, this.returnType);
-        return this.scope.typeCheck(new Accumulator<>(this.funName, funTypePair, accumulator));
+        return this.scope.typeCheck(environmentWithThisFunc);
     }
 
     @Override
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        IMeaning closure = new Closure_akaFunctionEvaluationDelayed(this.funBody, this.argName, accumulator);
-        return this.scope.value(new Accumulator<>(this.funName, closure, accumulator));
+        //recursive environment
+        IMeaning dummy = new IntegerRepresentation(0);
+        Accumulator<IMeaning> environmentWithPlaceholder = new Accumulator<>(this.funName, dummy, accumulator);
+        IMeaning closure = new Closure_akaFunctionEvaluationDelayed(this.funBody, this.argName, environmentWithPlaceholder);
+        environmentWithPlaceholder.update(this.funName, closure);
+
+        //alternate option: make the closure recursive by
+        //first passing in a dummy env to the closure, then updating the closure 
+
+        return this.scope.value(new Accumulator<>(this.funName, closure, environmentWithPlaceholder));
     }
 
     @Override

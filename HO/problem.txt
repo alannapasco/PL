@@ -28,6 +28,13 @@ Here is a JSON grammar that adds simple functions to our language:
 
    -- [Type, "->", Type]
 
+
+--Name can now return functions technically because there is an IMEANING representation of a function
+--expressions whose result is a function
+--use a set expression to set a variable to a different function than the original one it was set to
+--TODO: change the enum type to a TREE type (TypeAST) one of: bool, int, funPair, where each of these TypeASTs overrides .equals()
+
+
 INTERPRETATION
 
  [d, "->", r] is a (declared) type for a function from d to r
@@ -45,6 +52,13 @@ PROGRAMMING TASKS, set 1:
    the result is a Closure_akaFunctionEvaluationDelayed.
    
 4*. Write a function that runs forever. 
+
+
+
+
+
+
+
 
 PROGRAMMING TASKS, set 2:
 
@@ -65,8 +79,16 @@ is a declaration of function `f` that can be called in `e` and scope
 
 This makes `f` recursive and demands two changes:
 
-5. Revise the type checker to ensure `f` is used properly in `e`.
+5. Revise the type checker to ensure `f` is used properly in `e`. (--a one line change)
+
 6**. Revise the value function to realize recursion.
+
+
+
+
+
+
+
 7. Without "if", recursive functions aren't particularly
    interesting. But it is now trivial to write an infinite loop
    -- which wasn't possible to do before.

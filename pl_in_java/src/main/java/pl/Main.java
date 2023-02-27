@@ -2,6 +2,8 @@ package pl;
 import com.google.gson.*;
 import pl.AST.*;
 import pl.Meaning.IMeaning;
+import pl.TypePrediction.FunTypePair;
+import pl.TypePrediction.Type;
 import pl.TypePrediction.VarType;
 import pl.SymbolTable.Accumulator;
 
@@ -9,6 +11,22 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
+
+        //names are types in Java (nominal typing) - has become dominant typing through java/C
+        //the alternative is structural typing
+        //when you override .equals, you are creating structural typing
+        //typescript uses structural typing
+        //structural  is more expensive than nominal
+        //people thought nominal typing was 'better' for the human brain while programming
+        //structural typing solves:
+        //type systems restrict what you can say -- the reason programs terminate is because of the type systems
+        // -- if you remove the types then you can write infinite loops in a few weeks of developing a PL
+        //the current type system makes you copy code -- nominal typing makes you copy code -- structural does no
+        //
+        //the distinction is that the TYPE CHECKER uses nominal vs structural comparison -- but both
+        //languages (TS and java) ALLOW for both.
+        // == is nominal
+        // .equals() is structural
 
         ArrayList<JsonElement> input = Utils.processJsonExampleSeries("input.json");
         ArrayList<JsonElement> output = Utils.processJsonExampleSeries("output.json");
@@ -151,12 +169,12 @@ public class Main {
      * Parses a variable assignment in JSONLang
      */
     private static AST parseVariableAssignment(JsonArray expression){
-        String varTypeInput = expression.get(2).getAsString();
+        JsonElement varTypeInput = expression.get(2);
         String varName = expression.get(3).getAsString();
         JsonElement varVal = expression.get(5);
         JsonElement varScope = expression.get(7);
 
-        VarType varType;
+        Type varType;
         try {
             varType = Main.determineType(varTypeInput);
         } catch (Exception e) {
@@ -171,22 +189,22 @@ public class Main {
      * Parses a function in JSONlang
      */
     private static AST parseFunction(JsonArray expression){
-        String returnTypeStr = expression.get(2).getAsString();
+        JsonElement returnType = expression.get(2);
         String funName = expression.get(3).getAsString();
-        String argTypeStr = expression.get(4).getAsJsonArray().get(0).getAsString();
+        JsonElement argType = expression.get(4).getAsJsonArray().get(0);
         String argName = expression.get(4).getAsJsonArray().get(1).getAsString();
         JsonElement funVal = expression.get(5);
         JsonElement funScope = expression.get(7);
 
-        VarType returnType;
-        VarType argType;
+        Type returnTypeDetermined;
+        Type argTypeDetermined;
         try {
-            returnType = Main.determineType(returnTypeStr);
-            argType = Main.determineType(argTypeStr);
+            returnTypeDetermined = Main.determineType(returnType);
+            argTypeDetermined = Main.determineType(argType);
         } catch (Exception e) {
             return new ASTError(e.toString() + expression);
         }
-        return new ASTFun(returnType, funName, argType, argName, Main.parse(funVal), Main.parse(funScope));
+        return new ASTFun(returnTypeDetermined, funName, argTypeDetermined, argName, Main.parse(funVal), Main.parse(funScope));
     }
 
 
@@ -202,14 +220,23 @@ public class Main {
     /**
      * Determines the type
      */
-    private static VarType determineType(String input) throws Exception {
-        if (input.equals("int")) {
-            return VarType.INTEGER;
-        } else if (input.equals("bool")) {
-            return VarType.BOOLEAN;
-        } else {
-            throw new Exception("Invalid Variable Assignment Type ");
+    private static Type determineType(JsonElement input) throws Exception {
+        try {
+            String typeAsString = input.getAsString();
+            if (typeAsString.equals("int")) {
+                return VarType.INTEGER;
+            } else if (typeAsString.equals("bool")) {
+                return VarType.BOOLEAN;
+            } else {
+                throw new Exception("Invalid Variable Assignment Type");
+            }
+        } catch (Exception e){
+            JsonArray typeAsArray = input.getAsJsonArray();
+            Type declared = determineType(typeAsArray.get(0));
+            Type returned = determineType(typeAsArray.get(2));
+            return new FunTypePair(declared, returned);
         }
+
     }
 
 }

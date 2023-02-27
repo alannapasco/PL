@@ -17,7 +17,7 @@ public class ASTName implements AST {
         try {
             return accumulator.get(this.name);
         } catch (Exception e) {
-            throw new Exception("Type Error");
+            throw new Exception("Type Error - could not find " + this.name + " in the environment");
         }
     }
 
