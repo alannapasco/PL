@@ -35,26 +35,6 @@ public class ASTSub implements AST {
         }
     }
 
-    @Override
-    public AST staticDistance(Accumulator<Integer> accumulator) {
-        return new ASTSub(this.firstVal.staticDistance(accumulator), this.secondVal.staticDistance(accumulator));
-    }
-
-    @Override
-    public int countNumLetsInAST(int count) {
-        return this.firstVal.countNumLetsInAST(count) + this.secondVal.countNumLetsInAST(count);
-    }
-
-    @Override
-    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
-        if (this.firstVal.valueSD(acc, nextFreeSlot) instanceof IntegerRepresentation firstValRep
-                && this.secondVal.valueSD(acc, nextFreeSlot) instanceof IntegerRepresentation secondValRep) {
-            return compute(firstValRep.value, secondValRep.value);
-        } else {
-            throw new Exception("Invalid " + this.getClass().toString());
-        }
-    }
-
     private IMeaning compute(int firstVal, int secondVal) {
         return new IntegerRepresentation(firstVal - secondVal);
     }

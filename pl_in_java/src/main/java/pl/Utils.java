@@ -53,20 +53,13 @@ public class Utils {
         for (int i=0; i<actual.size(); i++){
 
             AST ast = Main.parse(actual.get(i));
-            //AST astWithSD = ast.staticDistance(new Accumulator<>());
-
             IMeaning actualVal;
-            //IMeaning actualValSD;
 
             try {
                 ast.typeCheck(new Accumulator<>());
                 actualVal = ast.value(new Accumulator<>());
-
-                //int numLets = ast.countNumLetsInAST(0);
-                //IMeaning[] valAcc = new IMeaning[numLets];
-                //actualValSD = astWithSD.valueSD(valAcc, numLets-1);
             } catch (Exception e) {
-                System.out.println(i);
+                System.out.println("TestCmp Failed at tc(): " + i);
                 continue;
             }
 
@@ -81,7 +74,6 @@ public class Utils {
                     System.out.println("Test Failed: " + i);
                     System.out.println("Expected: " + expectedVal);
                     System.out.println("Actual: " + actualVal);
-                    //System.out.println("ActualSD: " + actualValSD);
                 }
             }
         }

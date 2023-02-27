@@ -23,21 +23,6 @@ public class ASTBoolean implements AST {
     }
 
     @Override
-    public AST staticDistance(Accumulator<Integer> accumulator) {
-        return this;
-    }
-
-    @Override
-    public int countNumLetsInAST(int count) {
-        return count;
-    }
-
-    @Override
-    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) {
-        return new BooleanRepresentation(this.value);
-    }
-
-    @Override
     public String toString(){
         return String.valueOf(this.value);
     }

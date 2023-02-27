@@ -30,21 +30,6 @@ public class ASTSet implements AST {
     }
 
     @Override
-    public AST staticDistance(Accumulator<Integer> accumulator) {
-        return null;
-    }
-
-    @Override
-    public int countNumLetsInAST(int count) {
-        return 0;
-    }
-
-    @Override
-    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
-        return null;
-    }
-
-    @Override
     public String toString(){
         return "[set " + this.varName + " to " + this.newVal + "]";
     }

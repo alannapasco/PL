@@ -20,7 +20,7 @@ public class Closure_akaFunctionEvaluationDelayed implements IMeaning {
         this.environment = environment;
     }
 
-    public IMeaning apply(IMeaning argumentEvaluated) throws Exception {
+    public IMeaning execute(IMeaning argumentEvaluated) throws Exception {
         return this.funBody.value(new Accumulator<>(this.parameterName, argumentEvaluated, this.environment));
     }
 

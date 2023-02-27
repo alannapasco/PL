@@ -36,24 +36,7 @@ public class ASTFunCall implements AST {
     public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
         Closure_akaFunctionEvaluationDelayed closure = (Closure_akaFunctionEvaluationDelayed) accumulator.get(this.funName);
         IMeaning argumentEvaluated = this.funArg.value(accumulator);
-        return closure.apply(argumentEvaluated);
-    }
-
-    @Override
-    public AST staticDistance(Accumulator<Integer> accumulator) {
-      // MF: throw an `RuntimeException` instead, the ones that are _not_ declared and type-checked.
-        return null;
-    }
-
-    @Override
-    public int countNumLetsInAST(int count) {
-        return count;
-    }
-
-    @Override
-    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
-      // MF: throw an `RuntimeException` instead, the ones that are _not_ declared and type-checked.
-        return null;
+        return closure.execute(argumentEvaluated);
     }
 
     @Override

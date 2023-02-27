@@ -56,23 +56,6 @@ public class ASTFun implements AST {
     }
 
     @Override
-    public AST staticDistance(Accumulator<Integer> accumulator) {
-      // MF: throw an `RuntimeException` instead, the ones that are _not_ declared and type-checked.
-        return null;
-    }
-
-    @Override
-    public int countNumLetsInAST(int count) {
-        return count;
-    }
-
-    @Override
-    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
-      // MF: throw an `RuntimeException` instead, the ones that are _not_ declared and type-checked.
-        return null;
-    }
-
-    @Override
     public String toString(){
         return "[let fun " + this.returnType + " " + this.funName
                 + " [ " + this.argType + " " + this.argName + " ] "

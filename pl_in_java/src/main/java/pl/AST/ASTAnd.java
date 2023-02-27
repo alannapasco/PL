@@ -35,26 +35,6 @@ public class ASTAnd implements AST {
         }
     }
 
-    @Override
-    public AST staticDistance(Accumulator<Integer> accumulator) {
-        return new ASTAnd(this.firstVal.staticDistance(accumulator), this.secondVal.staticDistance(accumulator));
-    }
-
-    @Override
-    public int countNumLetsInAST(int count) {
-        return this.firstVal.countNumLetsInAST(count) + this.secondVal.countNumLetsInAST(count);
-    }
-
-    @Override
-    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
-        if (this.firstVal.valueSD(acc, nextFreeSlot) instanceof BooleanRepresentation firstValRep
-                && this.secondVal.valueSD(acc, nextFreeSlot) instanceof BooleanRepresentation secondValRep) {
-            return compute(firstValRep.value, secondValRep.value);
-        } else {
-            throw new Exception("Invalid " + this.getClass().toString());
-        }
-    }
-
     private IMeaning compute(boolean firstVal, boolean secondVal) {
         return new BooleanRepresentation(firstVal && secondVal);
     }

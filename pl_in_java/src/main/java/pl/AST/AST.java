@@ -42,19 +42,4 @@ public interface AST {
      */
     IMeaning value(Accumulator<IMeaning> accumulator) throws Exception;
 
-    /**
-     * Returns a brand new AST with all ASTName nodes turned to ASTStaticDistance nodes
-     * Integer in Accumulator<Integer> represents the current node's depth in the AST
-     */
-    AST staticDistance(Accumulator<Integer> accumulator);
-
-    /**
-     * Returns the number of let expressions in an AST
-     */
-    int countNumLetsInAST(int count);
-
-    /**
-     * Interprets the value of an AST that contains SD nodes
-     */
-    IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception;
 }

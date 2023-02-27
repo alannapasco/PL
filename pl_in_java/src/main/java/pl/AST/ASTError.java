@@ -23,21 +23,6 @@ public class ASTError implements AST {
     }
 
     @Override
-    public AST staticDistance(Accumulator<Integer> accumulator) {
-        return this;
-    }
-
-    @Override
-    public int countNumLetsInAST(int count) {
-        return count;
-    }
-
-    @Override
-    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
-        throw new Exception("Error: " + this.message);
-    }
-
-    @Override
     public String toString(){
         return "***" + this.message;
     }

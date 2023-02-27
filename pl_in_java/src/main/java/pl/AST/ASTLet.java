@@ -34,31 +34,6 @@ public class ASTLet implements AST{
     }
 
     @Override
-    public AST staticDistance(Accumulator<Integer> accumulator)  {
-        AST valueEvaluated = this.varValue.staticDistance(accumulator);
-
-        int depthInTree = 0;
-	// MF: use `isEmpty()` instead. 
-        if (accumulator.data != null){
-            depthInTree=accumulator.data+1;
-        }
-        AST scopeEvaluated = this.scope.staticDistance(new Accumulator<>(this.varName, depthInTree, accumulator));
-        return new ASTLet(this.varType, this.varName, valueEvaluated, scopeEvaluated);
-    }
-
-    @Override
-    public int countNumLetsInAST(int count) {
-        return this.scope.countNumLetsInAST(count) + 1;
-    }
-
-    @Override
-    public IMeaning valueSD(IMeaning[] acc, int nextFreeSlot) throws Exception {
-        IMeaning valueEvaluated = this.varValue.valueSD(acc, nextFreeSlot);
-        acc[nextFreeSlot] = valueEvaluated;
-        return this.scope.valueSD(acc, nextFreeSlot-1);
-    }
-
-    @Override
     public String toString(){
         return "[let " + this.varType + " " + this.varName + " = " + this.varValue.toString() + " in " + this.scope.toString() + "]";
     }
