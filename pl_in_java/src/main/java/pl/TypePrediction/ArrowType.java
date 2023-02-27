@@ -1,10 +1,10 @@
 package pl.TypePrediction;
 
-public class FunTypePair implements Type {
+public class ArrowType implements Type {
     public final Type argType;
     public final Type retType;
 
-    public FunTypePair(Type argType, Type retType){
+    public ArrowType(Type argType, Type retType){
         this.argType = argType;
         this.retType = retType;
     }
@@ -19,7 +19,7 @@ public class FunTypePair implements Type {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof FunTypePair x)) {
+        if (!(o instanceof ArrowType x)) {
             return false;
         }
         return this.argType.equals(x.argType) && this.retType.equals(x.retType);

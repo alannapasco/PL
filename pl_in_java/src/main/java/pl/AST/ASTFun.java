@@ -4,7 +4,7 @@ import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.Accumulator;
-import pl.TypePrediction.FunTypePair;
+import pl.TypePrediction.ArrowType;
 import pl.TypePrediction.Type;
 
 public class ASTFun implements AST {
@@ -30,7 +30,7 @@ public class ASTFun implements AST {
 
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        Type funTypePair = new FunTypePair(this.argType, this.returnType);
+        Type funTypePair = new ArrowType(this.argType, this.returnType);
         Accumulator<Type> environmentWithThisFunc = new Accumulator<>(this.funName, funTypePair, accumulator);
 
         Type retTypeVerified = this.funBody.typeCheck(new Accumulator<>(this.argName, this.argType, environmentWithThisFunc));
@@ -50,7 +50,7 @@ public class ASTFun implements AST {
         environmentWithPlaceholder.update(this.funName, closure);
 
         //alternate option: make the closure recursive by
-        //first passing in a dummy env to the closure, then updating the closure 
+        //first passing in a dummy env to the closure, then updating the closure
 
         return this.scope.value(new Accumulator<>(this.funName, closure, environmentWithPlaceholder));
     }

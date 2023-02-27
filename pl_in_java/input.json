@@ -50,7 +50,7 @@
 		"let","fun","int","not-name",["int","y"],["y","-","1"],"in",["call","name",10]
 	],
 	[
-		"asdf", "=", true
+		"set","asdf", true
 	],
 	true,
 	false,
@@ -106,63 +106,69 @@
 		"let","fun","bool","gt",["int","y"],["y",">",5],"in",["call","gt",10]
 	],
 	[
-		"let","var","int","x","=",5,"in",["let","fun","int","f",["int","y"],["x","+","y"],"in",["let","var","int","x","=",42,"in",["call","f",10]]]
-	],
-	["let", "fun", "int", "g", ["int", "y"], ["y","+", 32],
-		"in",
-		["call", "g", 10 ]
-	],
-	["let", "var", "int", "x", "=", 5,
-		"in",
-		["let", "fun", "int", "f", ["int", "y"], ["x", "+", "y"],
-			"in",
-			["call", "f", 10 ]]
-	],
-	["let", "var", "int", "x", "=", 5,
-		"in",
-		["let", "fun", "int", "f", ["int", "x"], ["x", "+", ["x", "+", 10]],
-			"in",
-			["call", "f", "x" ]]
-	],
-	["let", "var", "int", "x", "=", 5,
-		"in",
-		["let", "fun", "int", "f", ["int", "y"], ["x", "+", "y"],
-			"in",
-			["let", "var", "int", "x", "=", 42,
-				"in",
-				[["call", "f", "x" ], "+", ["call", "f", "x" ]]]]
+		"let","var","int","x","=",5,
+			"in",["let","fun","int","f",["int","y"],["x","+","y"],
+				"in",["let","var","int","x","=",42,
+					"in",["call","f",10]]]
 	],
 	[
-		"let","var","int","x","=",5, "in",["x", "=", ["x", "+", 1]]
+		"let", "fun", "int", "g", ["int", "y"], ["y","+", 32],
+			"in", ["call", "g", 10 ]
 	],
 	[
-		"let","var","int","x","=",5, "in", ["let","var","int","y","=", ["x", "=", ["x", "+", 1]], "in", "y"]
+		"let", "var", "int", "x", "=", 5,
+		"in", ["let", "fun", "int", "f", ["int", "y"], ["x", "+", "y"],
+			"in", ["call", "f", 10 ]]
 	],
 	[
-		"let","var","int","x","=",5, "in", ["let","var","int","y","=", ["x", "=", ["x", "+", 1]], "in", "x"]
+		"let", "var", "int", "x", "=", 5,
+			"in", ["let", "fun", "int", "f", ["int", "x"], ["x", "+", ["x", "+", 10]],
+				"in", ["call", "f", "x" ]]
+	],
+	[
+		"let", "var", "int", "x", "=", 5,
+			"in", ["let", "fun", "int", "f", ["int", "y"], ["x", "+", "y"],
+				"in", ["let", "var", "int", "x", "=", 42,
+					"in", [["call", "f", "x" ], "+", ["call", "f", "x"]]]]
 	],
 	[
 		"let","var","int","x","=",5,
-		"in",["let","fun","int","f",["int","y"],["let","var","int","z","=",["y","=",0],
-		"in",["x","+","y"]],
-		"in",["let","var","int","x","=",42,
-			"in",["call","f","x"]]]
+			"in", ["set", "x", ["x", "+", 1]]
 	],
 	[
 		"let","var","int","x","=",5,
-		"in",["let","fun","int","f",["int","y"],["x","+","y"],
-		"in",["let","var","int","x","=",42,
-			"in",["call","f",
-				["let","var","int","_","=",["x","=",["x","+",1]],
-					"in","x"]]]]
+			"in", ["let","var","int","y","=", ["set", "x", ["x", "+", 1]],
+				"in", "y"]
 	],
 	[
-		"let","var","int","x","=",1,"in",["let","fun","int","g",["int","y"],"x","in",["let","fun",["int","->","int"],"f",["int","y"],"g","in","f"]]
+		"let","var","int","x","=",5,
+			"in", ["let","var","int","y","=", ["set", "x", ["x", "+", 1]],
+				"in", "x"]
 	],
 	[
-		"let","var","int","x","=",1,"in",["let","fun","int","g",["int","y"],"x","in",["let","fun","int","f",[["int","->","int"],"y"],0,"in","f"]]
+		"let","var","int","x","=",5,
+			"in",["let","fun","int","f",["int","y"],["let","var","int","z","=",["set","y",0],
+				"in",["x","+","y"]],
+					"in",["let","var","int","x","=",42,
+						"in",["call","f","x"]]]
 	],
 	[
-		"let", "fun", "int", "f", ["int", "x"], ["call", "f", ["x", "+", 1]], "in", ["call", "f", 1]
+		"let","var","int","x","=",5,
+			"in",["let","fun","int","f",["int","y"],["x","+","y"],
+				"in",["let","var","int","x","=",42,
+					"in",["call","f", ["let","var","int","_","=",["set","x",["x","+",1]],
+						"in","x"]]]]
+	],
+	[
+		"let","var","int","x","=",1,
+			"in",["let","fun","int","g",["int","y"],"x",
+				"in",["let","fun",["int","->","int"],"f",["int","y"],"g",
+					"in","f"]]
+	],
+	[
+		"let","var","int","x","=",1,
+			"in",["let","fun","int","g",["int","y"],"x",
+				"in",["let","fun","int","f",[["int","->","int"],"y"],0,
+					"in","f"]]
 	]
 ]

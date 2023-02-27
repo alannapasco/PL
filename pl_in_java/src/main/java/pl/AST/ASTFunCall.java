@@ -3,7 +3,7 @@ package pl.AST;
 import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.Accumulator;
-import pl.TypePrediction.FunTypePair;
+import pl.TypePrediction.ArrowType;
 import pl.TypePrediction.Type;
 
 public class ASTFunCall implements AST {
@@ -18,9 +18,9 @@ public class ASTFunCall implements AST {
     @Override
     public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
         //Collect the info needed about the function being called
-        FunTypePair funTypePair;
+        ArrowType funTypePair;
         try {
-            funTypePair = (FunTypePair) accumulator.get(this.funName);
+            funTypePair = (ArrowType) accumulator.get(this.funName);
         } catch (Exception e) {
             throw new Exception("Type Error - function being called has not been defined properly");
         }

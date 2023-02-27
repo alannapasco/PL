@@ -33,5 +33,16 @@ Run these two programs, both return 1:
       "in",
       ["call","repeat",true]]]]]
 
--- Measure the maximum size of the "environment stack".
+-- Measure the maximum size of the "environment stack". -- size does not change with recursion 
+
+
+
+
+infinite:
+	[
+		"let", "fun", "int", "f", ["int", "x"], ["call", "f", ["x", "+", 1]], "in", ["call", "f", 1]
+	]
+
+
+
 

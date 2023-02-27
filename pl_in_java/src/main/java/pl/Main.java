@@ -1,8 +1,7 @@
 package pl;
 import com.google.gson.*;
 import pl.AST.*;
-import pl.Meaning.IMeaning;
-import pl.TypePrediction.FunTypePair;
+import pl.TypePrediction.ArrowType;
 import pl.TypePrediction.Type;
 import pl.TypePrediction.VarType;
 import pl.SymbolTable.Accumulator;
@@ -33,33 +32,7 @@ public class Main {
 
         Utils.testCmp(input, output);
         Main.process(input);
-        //Main.processWithStaticDistance(input);
 
-    }
-
-    /**
-     * Processes (parses -> type checks -> determines the value of) the given input examples
-     * by first converting all examples to a staticDistance AST
-     */
-    public static void processWithStaticDistance(ArrayList<JsonElement> examples) {
-        System.out.println("\n---------- SD AST - Parse -> typecheck -> value results: ----------");
-        for (JsonElement example: examples) {
-            AST ast = Main.parse(example);
-            AST astWithSD = ast.staticDistance(new Accumulator<>());
-            System.out.println("OR AST: " + ast + "\nSD AST: " + astWithSD);
-
-            try {
-                ast.typeCheck(new Accumulator<>());
-                System.out.println("value:   " + ast.value(new Accumulator<>()));
-
-                int numLets = ast.countNumLetsInAST(0);
-                IMeaning[] acc = new IMeaning[numLets];
-                System.out.println("valueSD: " + astWithSD.valueSD(acc, numLets-1));
-            } catch (Exception e) {
-                System.out.println("Error: " + e);
-            }
-            System.out.println();
-        }
     }
 
 
@@ -87,7 +60,7 @@ public class Main {
      */
     public static AST parse(JsonElement element) {
         if (element.isJsonPrimitive()) {
-            return Main.parsePrimitive(element.getAsJsonPrimitive());
+            return Main.parseSingleElement(element.getAsJsonPrimitive());
         } else if (element.isJsonArray()) {
             return Main.parseArray(element.getAsJsonArray());
         }
@@ -96,14 +69,13 @@ public class Main {
 
 
     /**
-     * Parses a single element of JSONLang
+     * Parses a single element (non-array) of JSONLang
      */
-    private static AST parsePrimitive(JsonPrimitive element) {
+    private static AST parseSingleElement(JsonPrimitive element) {
         try {
             int i = element.getAsInt();
             return new ASTInteger(i);
         } catch (NumberFormatException e) {
-            //here we could either have a string or boolean
             if (element.getAsBoolean() || element.getAsString().equals("false")) {
                 return new ASTBoolean(element.getAsBoolean());
             } else {
@@ -114,24 +86,27 @@ public class Main {
 
 
     /**
-     * Parses an array input of JSONLang
+     * Parses an element of JSONLang that is represented by a JSON array
      */
     private static AST parseArray(JsonArray expression) {
         String action = "";
         try {
             action = expression.get(0).getAsString();
         } catch (IllegalStateException e) {
-            //
+            //do not throw an error here; continue program flow
         }
 
         if (action.equals("let")) {
-            if (expression.get(1).getAsString().equals("var")) {
-                return Main.parseVariableAssignment(expression);
-            } else if (expression.get(1).getAsString().equals("fun")) {
+            String what = expression.get(1).getAsString();
+            if (what.equals("var")) {
+                return Main.parseVariableDeclaration(expression);
+            } else if (what.equals("fun")) {
                 return Main.parseFunction(expression);
             }
         } else if (action.equals("call")) {
             return Main.parseFunctionCall(expression);
+        } else if (action.equals("set")) {
+            return Main.parseVariableAssignment(expression);
         } else if (expression.size()==3) {
             return Main.parseOperation(expression);
         }
@@ -140,35 +115,9 @@ public class Main {
 
 
     /**
-     * Parses an operation represented in JSONLang
+     * Parses a variable declaration in JSONLang
      */
-    private static AST parseOperation(JsonArray operationExpression){
-        JsonElement firstVal = operationExpression.get(0);
-        String op = operationExpression.get(1).getAsString();
-        JsonElement secondVal = operationExpression.get(2);
-        switch (op) {
-            case "^":
-                return new ASTAnd(parse(firstVal), parse(secondVal));
-            case "||":
-                return new ASTOr(parse(firstVal), parse(secondVal));
-            case ">":
-                return new ASTGreaterThan(parse(firstVal), parse(secondVal));
-            case "-":
-                return new ASTSub(parse(firstVal), parse(secondVal));
-            case "+":
-                return new ASTAdd(parse(firstVal), parse(secondVal));
-            case "=":
-                return new ASTSet(firstVal.getAsString(), parse(secondVal));
-            default:
-                return new ASTError("Invalid Operator in expression: " + operationExpression + " ");
-        }
-    }
-
-
-    /**
-     * Parses a variable assignment in JSONLang
-     */
-    private static AST parseVariableAssignment(JsonArray expression){
+    private static AST parseVariableDeclaration(JsonArray expression){
         JsonElement varTypeInput = expression.get(2);
         String varName = expression.get(3).getAsString();
         JsonElement varVal = expression.get(5);
@@ -218,9 +167,43 @@ public class Main {
     }
 
     /**
-     * Determines the type
+     * Parses a variable (re)assignment in JSONlang
      */
-    private static Type determineType(JsonElement input) throws Exception {
+    private static AST parseVariableAssignment(JsonArray expression){
+        String varName = expression.get(1).getAsString();
+        JsonElement newVal = expression.get(2);
+        return new ASTSet(varName, parse(newVal));
+    }
+
+
+    /**
+     * Parses an operation in JSONLang
+     */
+    private static AST parseOperation(JsonArray operationExpression){
+        JsonElement firstVal = operationExpression.get(0);
+        String op = operationExpression.get(1).getAsString();
+        JsonElement secondVal = operationExpression.get(2);
+        switch (op) {
+            case "^":
+                return new ASTAnd(parse(firstVal), parse(secondVal));
+            case "||":
+                return new ASTOr(parse(firstVal), parse(secondVal));
+            case ">":
+                return new ASTGreaterThan(parse(firstVal), parse(secondVal));
+            case "-":
+                return new ASTSub(parse(firstVal), parse(secondVal));
+            case "+":
+                return new ASTAdd(parse(firstVal), parse(secondVal));
+            default:
+                return new ASTError("Invalid Operator in expression: " + operationExpression + " ");
+        }
+    }
+
+
+    /**
+     * Determines the type of variable being declared or assigned in JSONland
+     */
+    private static Type determineType(JsonElement input) {
         try {
             String typeAsString = input.getAsString();
             if (typeAsString.equals("int")) {
@@ -231,12 +214,10 @@ public class Main {
                 throw new Exception("Invalid Variable Assignment Type");
             }
         } catch (Exception e){
-            JsonArray typeAsArray = input.getAsJsonArray();
-            Type declared = determineType(typeAsArray.get(0));
-            Type returned = determineType(typeAsArray.get(2));
-            return new FunTypePair(declared, returned);
+            JsonArray arrowType = input.getAsJsonArray();
+            Type declared = determineType(arrowType.get(0));
+            Type returned = determineType(arrowType.get(2));
+            return new ArrowType(declared, returned);
         }
-
     }
-
 }
