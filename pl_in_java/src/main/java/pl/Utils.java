@@ -2,13 +2,12 @@ package pl;
 
 import com.google.gson.*;
 import pl.AST.AST;
-import pl.AST.ASTBoolean;
-import pl.AST.ASTName;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.Environment;
+import pl.SymbolTable.MtEnvironment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,8 +55,8 @@ public class Utils {
             IMeaning actualVal;
 
             try {
-                ast.typeCheck(new Accumulator<>());
-                actualVal = ast.value(new Accumulator<>());
+                ast.typeCheck(new MtEnvironment<>());
+                actualVal = ast.value(new MtEnvironment<>());
             } catch (Exception e) {
                 System.out.println("TestCmp Failed at tc(): " + i);
                 continue;

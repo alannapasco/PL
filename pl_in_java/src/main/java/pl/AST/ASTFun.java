@@ -3,7 +3,8 @@ package pl.AST;
 import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.Environment;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.ArrowType;
 import pl.TypePrediction.Type;
 
@@ -29,11 +30,10 @@ public class ASTFun implements AST {
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        Type funTypePair = new ArrowType(this.argType, this.returnType);
-        Accumulator<Type> environmentWithThisFunc = new Accumulator<>(this.funName, funTypePair, accumulator);
-
-        Type retTypeVerified = this.funBody.typeCheck(new Accumulator<>(this.argName, this.argType, environmentWithThisFunc));
+    public Type typeCheck(IEnvironment<Type> env) throws Exception {
+        Type arrow = new ArrowType(this.argType, this.returnType);
+        IEnvironment<Type> environmentWithThisFunc = new Environment<>(this.funName, arrow, env);
+        Type retTypeVerified = this.funBody.typeCheck(new Environment<>(this.argName, this.argType, environmentWithThisFunc));
         if (!retTypeVerified.equals(returnType)) {
             throw new Exception("Type Error - Function body " + this.funBody + " does not evaluate to the correct return type " + this.returnType);
         }
@@ -42,17 +42,17 @@ public class ASTFun implements AST {
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
+    public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
         //recursive environment
         IMeaning dummy = new IntegerRepresentation(0);
-        Accumulator<IMeaning> environmentWithPlaceholder = new Accumulator<>(this.funName, dummy, accumulator);
+        IEnvironment<IMeaning> environmentWithPlaceholder = new Environment<>(this.funName, dummy, env);
         IMeaning closure = new Closure_akaFunctionEvaluationDelayed(this.funBody, this.argName, environmentWithPlaceholder);
         environmentWithPlaceholder.update(this.funName, closure);
 
         //alternate option: make the closure recursive by
         //first passing in a dummy env to the closure, then updating the closure
 
-        return this.scope.value(new Accumulator<>(this.funName, closure, environmentWithPlaceholder));
+        return this.scope.value(new Environment<>(this.funName, closure, environmentWithPlaceholder));
     }
 
     @Override

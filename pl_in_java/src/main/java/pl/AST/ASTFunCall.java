@@ -2,7 +2,7 @@ package pl.AST;
 
 import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.ArrowType;
 import pl.TypePrediction.Type;
 
@@ -16,26 +16,26 @@ public class ASTFunCall implements AST {
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
+    public Type typeCheck(IEnvironment<Type> env) throws Exception {
         //Collect the info needed about the function being called
-        ArrowType funTypePair;
+        ArrowType arrow;
         try {
-            funTypePair = (ArrowType) accumulator.get(this.funName);
+            arrow = (ArrowType) env.get(this.funName);
         } catch (Exception e) {
             throw new Exception("Type Error - function being called has not been defined properly");
         }
 
         //Check that the given argument is the correct type
-        if (!funTypePair.argType.equals(this.funArg.typeCheck(accumulator))){
-            throw new Exception("Type Error - given argument type'" + funTypePair.argType + "' is not the correct type as specified by " + this.funName + "'s function signature");
+        if (!arrow.argType.equals(this.funArg.typeCheck(env))){
+            throw new Exception("Type Error - given argument type'" + arrow.argType + "' is not the correct type as specified by " + this.funName + "'s function signature");
         }
-        return funTypePair.retType;
+        return arrow.retType;
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        Closure_akaFunctionEvaluationDelayed closure = (Closure_akaFunctionEvaluationDelayed) accumulator.get(this.funName);
-        IMeaning argumentEvaluated = this.funArg.value(accumulator);
+    public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
+        Closure_akaFunctionEvaluationDelayed closure = (Closure_akaFunctionEvaluationDelayed) env.get(this.funName);
+        IMeaning argumentEvaluated = this.funArg.value(env);
         return closure.execute(argumentEvaluated);
     }
 

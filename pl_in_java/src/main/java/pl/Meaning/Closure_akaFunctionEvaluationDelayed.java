@@ -5,7 +5,7 @@ import pl.SymbolTable.*;
 public class Closure_akaFunctionEvaluationDelayed implements IMeaning {
     private final AST funBody;
     private final String parameterName;
-    private final Accumulator<IMeaning> environment;
+    private final IEnvironment<IMeaning> environment;
 
     public Closure_akaFunctionEvaluationDelayed(){
         this.funBody = null;
@@ -14,14 +14,14 @@ public class Closure_akaFunctionEvaluationDelayed implements IMeaning {
     }
 
     // "introduction" / "create"
-    public Closure_akaFunctionEvaluationDelayed(AST funBody, String parameter, Accumulator<IMeaning> environment) {
+    public Closure_akaFunctionEvaluationDelayed(AST funBody, String parameter, IEnvironment<IMeaning> environment) {
         this.funBody = funBody;
         this.parameterName = parameter;
         this.environment = environment;
     }
 
     public IMeaning execute(IMeaning argumentEvaluated) throws Exception {
-        return this.funBody.value(new Accumulator<>(this.parameterName, argumentEvaluated, this.environment));
+        return this.funBody.value(new Environment<>(this.parameterName, argumentEvaluated, this.environment));
     }
 
     @Override

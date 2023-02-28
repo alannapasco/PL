@@ -1,7 +1,7 @@
 package pl.AST;
 
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.Type;
 
 public class ASTSet implements AST {
@@ -14,9 +14,9 @@ public class ASTSet implements AST {
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        Type existingVarType = accumulator.get(this.varName);
-        Type newValType = this.newVal.typeCheck(accumulator);
+    public Type typeCheck(IEnvironment<Type> env) throws Exception {
+        Type existingVarType = env.get(this.varName);
+        Type newValType = this.newVal.typeCheck(env);
         if (!existingVarType.equals(newValType)){
             throw new Exception("Type Error");
         } else {
@@ -25,8 +25,8 @@ public class ASTSet implements AST {
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        return accumulator.update(this.varName, this.newVal.value(accumulator));
+    public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
+        return env.update(this.varName, this.newVal.value(env));
     }
 
     @Override

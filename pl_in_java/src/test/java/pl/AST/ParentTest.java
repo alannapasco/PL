@@ -2,7 +2,6 @@ package pl.AST;
 
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.Accumulator;
 import pl.TypePrediction.VarType;
 
 public class ParentTest {
@@ -24,9 +23,6 @@ public class ParentTest {
 
     IMeaning boolrepT;
     IMeaning boolrepF;
-
-    Accumulator<VarType> typeAcc;
-    Accumulator<IMeaning> valAcc;
 
     int numLets;
     String[] sdAcc;

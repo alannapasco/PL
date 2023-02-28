@@ -1,7 +1,7 @@
 package pl.AST;
 
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.Type;
 
 
@@ -13,18 +13,18 @@ public class ASTName implements AST {
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
+    public Type typeCheck(IEnvironment<Type> env) throws Exception {
         try {
-            return accumulator.get(this.name);
+            return env.get(this.name);
         } catch (Exception e) {
             throw new Exception("Type Error - could not find " + this.name + " in the environment");
         }
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
+    public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
         try {
-            return accumulator.get(this.name);
+            return env.get(this.name);
         } catch (Exception e) {
             throw new Exception("Invalid " + this.getClass().toString());
         }

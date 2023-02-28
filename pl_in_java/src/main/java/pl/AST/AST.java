@@ -1,7 +1,7 @@
 package pl.AST;
 
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.Type;
 
 /**  
@@ -35,11 +35,11 @@ public interface AST {
     /**
      * Classifies the expression as either int type or bool type
      */
-    Type typeCheck(Accumulator<Type> accumulator) throws Exception;
+    Type typeCheck(IEnvironment<Type> env) throws Exception;
 
     /**
      * Determines the value of the AST expression
      */
-    IMeaning value(Accumulator<IMeaning> accumulator) throws Exception;
+    IMeaning value(IEnvironment<IMeaning> env) throws Exception;
 
 }

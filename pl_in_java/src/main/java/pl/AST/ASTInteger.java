@@ -2,7 +2,7 @@ package pl.AST;
 
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.Type;
 import pl.TypePrediction.VarType;
 
@@ -14,12 +14,12 @@ public class ASTInteger implements AST {
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) {
+    public Type typeCheck(IEnvironment<Type> env) {
         return VarType.INTEGER;
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) {
+    public IMeaning value(IEnvironment<IMeaning> env) {
         return new IntegerRepresentation(this.value);
     }
 

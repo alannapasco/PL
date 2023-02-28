@@ -2,7 +2,7 @@ package pl.AST;
 
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.Type;
 import pl.TypePrediction.VarType;
 
@@ -17,9 +17,9 @@ public class ASTOr implements AST {
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        if (this.firstVal.typeCheck(accumulator)== VarType.BOOLEAN
-                && this.secondVal.typeCheck(accumulator)== VarType.BOOLEAN) {
+    public Type typeCheck(IEnvironment<Type> env) throws Exception {
+        if (this.firstVal.typeCheck(env)== VarType.BOOLEAN
+                && this.secondVal.typeCheck(env)== VarType.BOOLEAN) {
             return VarType.BOOLEAN;
         } else {
             throw new Exception("Type Error");
@@ -27,9 +27,9 @@ public class ASTOr implements AST {
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        if (this.firstVal.value(accumulator) instanceof BooleanRepresentation firstValRep
-                && this.secondVal.value(accumulator) instanceof BooleanRepresentation secondValRep) {
+    public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
+        if (this.firstVal.value(env) instanceof BooleanRepresentation firstValRep
+                && this.secondVal.value(env) instanceof BooleanRepresentation secondValRep) {
             return compute(firstValRep.value, secondValRep.value);
         }else {
             throw new Exception("Invalid " + this.getClass().toString());

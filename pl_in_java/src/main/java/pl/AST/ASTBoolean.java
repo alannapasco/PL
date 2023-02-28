@@ -1,7 +1,7 @@
 package pl.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.Type;
 import pl.TypePrediction.VarType;
 
@@ -13,12 +13,12 @@ public class ASTBoolean implements AST {
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) {
+    public Type typeCheck(IEnvironment<Type> env) {
         return VarType.BOOLEAN;
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) {
+    public IMeaning value(IEnvironment<IMeaning> env) {
         return new BooleanRepresentation(this.value);
     }
 

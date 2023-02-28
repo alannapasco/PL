@@ -3,7 +3,7 @@ package pl.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.Type;
 import pl.TypePrediction.VarType;
 
@@ -17,9 +17,9 @@ public class ASTGreaterThan implements AST {
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        if (this.firstVal.typeCheck(accumulator)== VarType.INTEGER
-                && this.secondVal.typeCheck(accumulator)== VarType.INTEGER) {
+    public Type typeCheck(IEnvironment<Type> env) throws Exception {
+        if (this.firstVal.typeCheck(env)== VarType.INTEGER
+                && this.secondVal.typeCheck(env)== VarType.INTEGER) {
             return VarType.BOOLEAN;
         } else {
             throw new Exception("Type Error");
@@ -27,9 +27,9 @@ public class ASTGreaterThan implements AST {
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        if (this.firstVal.value(accumulator) instanceof IntegerRepresentation firstValRep
-                && this.secondVal.value(accumulator) instanceof IntegerRepresentation secondValRep) {
+    public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
+        if (this.firstVal.value(env) instanceof IntegerRepresentation firstValRep
+                && this.secondVal.value(env) instanceof IntegerRepresentation secondValRep) {
             return compute(firstValRep.value, secondValRep.value);
         }else {
             throw new Exception("Invalid " + this.getClass().toString());

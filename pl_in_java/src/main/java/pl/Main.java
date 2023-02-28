@@ -1,10 +1,10 @@
 package pl;
 import com.google.gson.*;
 import pl.AST.*;
+import pl.SymbolTable.MtEnvironment;
 import pl.TypePrediction.ArrowType;
 import pl.TypePrediction.Type;
 import pl.TypePrediction.VarType;
-import pl.SymbolTable.Accumulator;
 
 import java.util.ArrayList;
 
@@ -45,8 +45,8 @@ public class Main {
             AST ast = Main.parse(example);
             System.out.println("AST:   " + ast);
             try {
-                ast.typeCheck(new Accumulator<>());
-                System.out.println("Value: " + ast.value(new Accumulator<>()));
+                ast.typeCheck(new MtEnvironment<>());
+                System.out.println("Value: " + ast.value(new MtEnvironment<>()));
             } catch (Exception e) {
                 System.out.println("Error: " + e);
             }

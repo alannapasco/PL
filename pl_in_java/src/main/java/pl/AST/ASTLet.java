@@ -1,7 +1,8 @@
 package pl.AST;
 
 import pl.Meaning.IMeaning;
-import pl.SymbolTable.Accumulator;
+import pl.SymbolTable.Environment;
+import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.Type;
 
 
@@ -19,18 +20,18 @@ public class ASTLet implements AST{
     }
 
     @Override
-    public Type typeCheck(Accumulator<Type> accumulator) throws Exception {
-        Type typeVerified = varValue.typeCheck(accumulator);
+    public Type typeCheck(IEnvironment<Type> env) throws Exception {
+        Type typeVerified = varValue.typeCheck(env);
         if (!typeVerified.equals(varType)) {
             throw new Exception("Type Error");
         }
-        return this.scope.typeCheck(new Accumulator<>(this.varName, this.varType, accumulator));
+        return this.scope.typeCheck(new Environment<>(this.varName, this.varType, env));
     }
 
     @Override
-    public IMeaning value(Accumulator<IMeaning> accumulator) throws Exception {
-        IMeaning valueEvaluated = this.varValue.value(accumulator);
-        return this.scope.value(new Accumulator<>(this.varName, valueEvaluated, accumulator));
+    public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
+        IMeaning valueEvaluated = this.varValue.value(env);
+        return this.scope.value(new Environment<>(this.varName, valueEvaluated, env));
     }
 
     @Override
