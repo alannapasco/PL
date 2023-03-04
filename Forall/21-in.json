@@ -1,0 +1,1 @@
+["let","var","int","x","=",100,"in",["let","fun","int","body",["bool","_"],["x","=",["x","-",1]],"in",["let","fun","bool","condition",["bool","_"],["x","==",0],"in",["let","fun","int","repeat",["bool","_"],["let","var","int","x","=",["call","body",true],"in",["if",["call","condition",true],"x","else",["call","repeat",true]]],"in",["call","repeat",true]]]]]
