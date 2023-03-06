@@ -23,7 +23,7 @@ public class ASTLet implements AST{
     public Type typeCheck(IEnvironment<Type> env) throws Exception {
         Type typeVerified = varValue.typeCheck(env);
         if (!typeVerified.equals(varType)) {
-            throw new Exception("Type Error");
+            throw new Exception("Type Error - the given var's type " + typeVerified + " does not match the expected " + this.varType);
         }
         return this.scope.typeCheck(new Environment<>(this.varName, this.varType, env));
     }
@@ -37,5 +37,20 @@ public class ASTLet implements AST{
     @Override
     public String toString(){
         return "[let " + this.varType + " " + this.varName + " = " + this.varValue.toString() + " in " + this.scope.toString() + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof ASTLet x)) {
+            return false;
+        }
+
+        return this.varType.equals(x.varType)
+                && this.varName.equals(x.varName)
+                && this.varValue.equals(x.varValue)
+                && this.scope.equals(x.scope);
     }
 }

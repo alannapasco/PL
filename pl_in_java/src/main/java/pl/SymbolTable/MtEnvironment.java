@@ -15,4 +15,12 @@ public class MtEnvironment<T> extends AEnvironment<T> {
     public T update(String name, T newData) throws Exception {
         throw new Exception("Reached end of environment and did not find record to update.");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        return o instanceof MtEnvironment;
+    }
 }

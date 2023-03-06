@@ -22,7 +22,7 @@ public class ASTOr implements AST {
                 && this.secondVal.typeCheck(env)== VarType.BOOLEAN) {
             return VarType.BOOLEAN;
         } else {
-            throw new Exception("Type Error");
+            throw new Exception("Type Error - one of the AST around an Or expression is not a Boolean");
         }
     }
 
@@ -50,10 +50,9 @@ public class ASTOr implements AST {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof ASTOr)) {
+        if (!(o instanceof ASTOr x)) {
             return false;
         }
-        ASTOr x = (ASTOr) o;
         return this.firstVal.equals(x.firstVal) && this.secondVal.equals(x.secondVal);
     }
 

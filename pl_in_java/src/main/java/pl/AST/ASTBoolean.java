@@ -32,10 +32,9 @@ public class ASTBoolean implements AST {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof ASTBoolean)) {
+        if (!(o instanceof ASTBoolean x)) {
             return false;
         }
-        ASTBoolean x = (ASTBoolean) o;
         return this.value == x.value;
     }
 

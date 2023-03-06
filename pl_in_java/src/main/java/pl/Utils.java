@@ -3,10 +3,9 @@ package pl;
 import com.google.gson.*;
 import pl.AST.AST;
 import pl.Meaning.BooleanRepresentation;
-import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
+import pl.Meaning.Closure;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
-import pl.SymbolTable.Environment;
 import pl.SymbolTable.MtEnvironment;
 
 import java.io.File;
@@ -62,18 +61,14 @@ public class Utils {
                 continue;
             }
 
-            int numErrorExamples = 19;
+            int numErrorExamples = 22;
             IMeaning expectedVal = Utils.getExpected(expOutput.get(i-numErrorExamples).getAsJsonPrimitive());
             if (expectedVal.equals(actualVal)){
                 System.out.println("Test Passed: " + i);
             } else {
-                if (actualVal.toString().contains("Closure")) {
-                    System.out.println("Test Passed: " + i);
-                } else {
-                    System.out.println("Test Failed: " + i);
-                    System.out.println("Expected: " + expectedVal);
-                    System.out.println("Actual: " + actualVal);
-                }
+                System.out.println("Test Failed: " + i);
+                System.out.println("Expected: " + expectedVal);
+                System.out.println("Actual: " + actualVal);
             }
         }
         System.out.println();
@@ -88,7 +83,7 @@ public class Utils {
                 boolean b = expected.getAsBoolean();
                 return new BooleanRepresentation(b);
             } else {
-                return new Closure_akaFunctionEvaluationDelayed();
+                return new Closure();
             }
 
 

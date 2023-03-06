@@ -34,4 +34,15 @@ public class ASTName implements AST {
     public String toString(){
         return "var:" + this.name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof ASTName x)) {
+            return false;
+        }
+        return this.name.equals(x.name);
+    }
 }

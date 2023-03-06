@@ -1,6 +1,6 @@
 package pl.AST;
 
-import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
+import pl.Meaning.Closure;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.IEnvironment;
 import pl.TypePrediction.ArrowType;
@@ -34,7 +34,7 @@ public class ASTFunCall implements AST {
 
     @Override
     public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
-        Closure_akaFunctionEvaluationDelayed closure = (Closure_akaFunctionEvaluationDelayed) env.get(this.funName);
+        Closure closure = (Closure) env.get(this.funName);
         IMeaning argumentEvaluated = this.funArg.value(env);
         return closure.execute(argumentEvaluated);
     }
@@ -42,5 +42,16 @@ public class ASTFunCall implements AST {
     @Override
     public String toString(){
         return "funCall: " + this.funName + "(" + funArg + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof ASTFunCall x)) {
+            return false;
+        }
+        return this.funName.equals(x.funName) && this.funArg.equals(x.funArg);
     }
 }

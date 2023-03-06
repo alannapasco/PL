@@ -33,10 +33,9 @@ public class ASTInteger implements AST {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof ASTInteger)) {
+        if (!(o instanceof ASTInteger x)) {
             return false;
         }
-        ASTInteger x = (ASTInteger) o;
         return this.value == x.value;
     }
 }

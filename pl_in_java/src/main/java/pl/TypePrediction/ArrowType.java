@@ -11,7 +11,7 @@ public class ArrowType implements Type {
 
     @Override
     public String toString(){
-        return "[FunTypePair: " + argType + ", " + retType + "]";
+        return "[ArrowType: " + argType + ", " + retType + "]";
     }
 
     @Override

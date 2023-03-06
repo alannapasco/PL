@@ -8,6 +8,15 @@ import pl.TypePrediction.VarType;
 
 import java.util.ArrayList;
 
+/**
+[ StackOverflow example:
+ "let", "fun", "int", "f", ["int", "x"], "x", "in",
+ ["let", "fun", "int", "g", ["int", "y"], ["call", "f", "y"], "in",
+ ["let", "var", ["int", "->", "int"], "_", "=", ["set", "f", "g"], "in",
+ ["call", "f", 0]]]
+ ]
+ */
+
 public class Main {
     public static void main(String[] args) {
 
@@ -107,6 +116,10 @@ public class Main {
             return Main.parseFunctionCall(expression);
         } else if (action.equals("set")) {
             return Main.parseVariableAssignment(expression);
+        } else if (action.equals("repeat")) {
+            return Main.parseRepeat(expression);
+        } else if (action.equals("if")) {
+            return Main.parseIfExpression(expression);
         } else if (expression.size()==3) {
             return Main.parseOperation(expression);
         }
@@ -177,6 +190,27 @@ public class Main {
 
 
     /**
+     * Parses a repeat _ until _ expression in JSONlang
+     */
+    private static AST parseRepeat(JsonArray expression){
+        JsonElement theDo = expression.get(1);
+        JsonElement until = expression.get(3);
+        return new ASTRepeat(parse(theDo), parse(until));
+    }
+
+
+    /**
+     * Parses an if expression in JSONlang
+     */
+    private static AST parseIfExpression(JsonArray expression) {
+        JsonElement condition = expression.get(1);
+        JsonElement doExpression = expression.get(2);
+        JsonElement doElse = expression.get(4);
+        return new ASTIfElse(parse(condition), parse(doExpression), parse(doElse));
+    }
+
+
+    /**
      * Parses an operation in JSONLang
      */
     private static AST parseOperation(JsonArray operationExpression){
@@ -194,6 +228,8 @@ public class Main {
                 return new ASTSub(parse(firstVal), parse(secondVal));
             case "+":
                 return new ASTAdd(parse(firstVal), parse(secondVal));
+            case "==":
+                return new ASTEquals(parse(firstVal), parse(secondVal));
             default:
                 return new ASTError("Invalid Operator in expression: " + operationExpression + " ");
         }

@@ -22,7 +22,7 @@ public class ASTGreaterThan implements AST {
                 && this.secondVal.typeCheck(env)== VarType.INTEGER) {
             return VarType.BOOLEAN;
         } else {
-            throw new Exception("Type Error");
+            throw new Exception("Type Error - one of the AST around an GT expression is not an Integer");
         }
     }
 
@@ -43,5 +43,16 @@ public class ASTGreaterThan implements AST {
     @Override
     public String toString(){
         return "[" + this.firstVal + " > " + this.secondVal + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof ASTGreaterThan x)) {
+            return false;
+        }
+        return this.firstVal.equals(x.firstVal) && this.secondVal.equals(x.secondVal);
     }
 }

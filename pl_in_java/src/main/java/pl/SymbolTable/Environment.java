@@ -42,4 +42,18 @@ public class Environment<T> extends AEnvironment<T> {
             return this.rest.update(name, newData);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Environment)) {
+            return false;
+        }
+        Environment x = (Environment) o;
+        return this.name.equals(x.name)
+                && this.data.equals(x.data)
+                && this.rest.equals(x.rest);
+    }
 }

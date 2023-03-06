@@ -18,7 +18,7 @@ public class ASTSet implements AST {
         Type existingVarType = env.get(this.varName);
         Type newValType = this.newVal.typeCheck(env);
         if (!existingVarType.equals(newValType)){
-            throw new Exception("Type Error");
+            throw new Exception("Type Error - the new val's type " + newValType + " does not match the old val's type " + existingVarType);
         } else {
             return existingVarType;
         }
@@ -32,5 +32,16 @@ public class ASTSet implements AST {
     @Override
     public String toString(){
         return "[set " + this.varName + " to " + this.newVal + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof ASTSet x)) {
+            return false;
+        }
+        return this.varName.equals(x.varName) && this.newVal.equals(x.newVal);
     }
 }

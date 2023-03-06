@@ -21,7 +21,7 @@ public class ASTAnd implements AST {
                 && this.secondVal.typeCheck(env)== VarType.BOOLEAN) {
             return VarType.BOOLEAN;
         } else {
-            throw new Exception("Type Error");
+            throw new Exception("Type Error - one of the AST around an And expression is not a Boolean");
         }
     }
 
@@ -49,10 +49,9 @@ public class ASTAnd implements AST {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof ASTAnd)) {
+        if (!(o instanceof ASTAnd x)) {
             return false;
         }
-        ASTAnd x = (ASTAnd) o;
         return this.firstVal.equals(x.firstVal) && this.secondVal.equals(x.secondVal);
     }
 }

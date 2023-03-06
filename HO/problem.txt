@@ -96,14 +96,40 @@ This makes `f` recursive and demands two changes:
 8. Write an HOJSON function "setx" to update the "x" in the following
    program to a new value: 
 
+   -- ["let", "var", Type, Name, "=", HOJSON, "in", HOJSON]
+   -- ["let", "fun", Type, Name, [Type, Name], HOJSON, "in", HOJSON]
+
+
 ```
 ;; a function for setting an int var to a new value 
-["let", "var", ...", "x", "=", ..., "in",
-      ["let", "fun", "int", "setx", ... , ..., "in"
+["let", "var", T..., "x", "=", ..., "in",
+      ["let", "fun", "int", "setx", [T..., ...] , ..., "in"
             ["let", "var", t", "_", "=", ["call","setx", ...], "in",
+                  "x"]]]
+```
+INT
+
+["let", "var", "int", "x", "=", 0, "in",
+      ["let", "fun", "int", "setx", [int, newX] , [set, x, newX], "in"
+            ["let", "var", "int", "_", "=", ["call","setx", 1], "in",
+                  "x"]]]
+```
+BOOL
+
+["let", "var", "bool", "x", "=", T, "in",
+      ["let", "fun", "int", "setx", [bool, newX] , [set, x, newX], "in"
+            ["let", "var", t", "_", "=", ["call","setx", F], "in",
+                  "x"]]]
+```
+ARROW
+
+["let", "var", "I->I", "x", "=", ???, "in",
+      ["let", "fun", "int", "setx", ["I->I", newX] , [set, x, newX], "in"
+            ["let", "var", t", "_", "=", ["call","setx", ???], "in",
                   "x"]]]
 ```
 
    Do this for t as "int", "bool", and ["int", "->", "bool"]. 
 
    Should a working developer be disturbed?
+

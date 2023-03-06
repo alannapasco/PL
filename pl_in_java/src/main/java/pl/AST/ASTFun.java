@@ -1,6 +1,6 @@
 package pl.AST;
 
-import pl.Meaning.Closure_akaFunctionEvaluationDelayed;
+import pl.Meaning.Closure;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.Environment;
@@ -46,7 +46,7 @@ public class ASTFun implements AST {
         //recursive environment
         IMeaning dummy = new IntegerRepresentation(0);
         IEnvironment<IMeaning> environmentWithPlaceholder = new Environment<>(this.funName, dummy, env);
-        IMeaning closure = new Closure_akaFunctionEvaluationDelayed(this.funBody, this.argName, environmentWithPlaceholder);
+        IMeaning closure = new Closure(this.funBody, this.argName, environmentWithPlaceholder);
         environmentWithPlaceholder.update(this.funName, closure);
 
         //alternate option: make the closure recursive by
@@ -60,4 +60,21 @@ public class ASTFun implements AST {
         return "[let fun " + this.returnType + " " + this.funName
                 + " [ " + this.argType + " " + this.argName + " ] "
                 + this.funBody.toString() + " in " + this.scope.toString() +"]"; }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof ASTFun x)) {
+            return false;
+        }
+        return this.returnType.equals(x.returnType)
+                && this.funName.equals(x.funName)
+                && this.argType.equals(x.argType)
+                && this.argName.equals(x.argName)
+                && this.funBody.equals(x.funBody)
+                && this.scope.equals(x.scope);
+    }
 }
