@@ -20,6 +20,6 @@
 (define (env-retrieve env x fmt (f (λ (s a e) (error 'retrieve fmt x))))
   (define v (assq x env))
   (match v
-    [#false              (error 'retrieve fmt x)]
+    [#false              (error 'retrieve  (~a fmt ": ~a") x)]
     [(list x 'plain m)   m]
     [(list x 'rec m env) (f x m env)]))

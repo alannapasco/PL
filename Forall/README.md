@@ -38,7 +38,7 @@
 
 - TypeName is just a name. (If you're comfortable with Greek letters, use those for readability.)
 
-Examples:
+### Example:
 
 Abstract the two `expt-` functions in the following 'program' into a
 single function and use it instead:  
@@ -91,15 +91,21 @@ _Solution_
 
 ### Type Checking
 
-- ["tfun", [α], rt, f, [at, x], rhs, "in", body]
-  f is given the type (∀ α (at -> rt)) while type checking rhs and body (recursion!) 
-  then the type of the entire expression is the type of body 
+1. constraint that we won't check but that can go wrong if you construct your own examples: 
 
-- ["tcall", f, t]
-  if f must be of type (∀ α t1) (and α is not contained in t)
-  then the type of the entire expression is t1 with all α replaced by t
-  (Because of the constraint, this is non-trivial. Assume for now it's always true.)
-  
+   - a type that contains a name that is not _declared_ with a ∀, example: (∀ α β)
+
+2. the basic two rules: 
+
+   - ["tfun", [α], rt, f, [at, x], rhs, "in", body]
+     f is given the type (∀ α (at -> rt)) while type checking rhs and body (recursion!) 
+     then the type of the entire expression is the type of body 
+
+   - ["tcall", f, t]
+     if f must be of type (∀ α t1) (and α is not contained in t)
+     then the type of the entire expression is t1 with all α replaced by t
+     (Because of the constraint, this is non-trivial. Assume for now it's always true.)
+
 ### Evaluation
 
 Types don't exist at run time: 
