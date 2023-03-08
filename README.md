@@ -20,6 +20,10 @@ Language Concepts, Language Features
 - conditionals and loops,
   recursive functions vs loops (measured)
 
+- parametric polymorphism: forall types 
+
+- classes -- object as instance (Java) 
+
 - specification vs implementation; "meta" properties 
   - duality of language features: introduction, elimination
     - arithmetic seems to stand out 
@@ -46,7 +50,6 @@ More Language Features (?)
     - a la TypedRacket 
 
   - objects -- what's a higher-order function? (JavaScript, pure)
-  - classes -- object as instance (Java) 
 
   - syntactic abbreviations?
 
