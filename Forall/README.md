@@ -128,6 +128,11 @@ types may use "α" in `rt`, `at`, `rhs`, and `scope`.
    - then the type of the entire expression is t1 with all α replaced by t
    - (_Because of the constraint, this is non-trivial. Assume for now it's always true._)
 
+3. Type Equality:
+   - type1 = `(∀ α (α -> int))` is the same type2 = `(∀ t (t -> int))`
+   - just like f and g are the same function if, say, f(x) x + 1 is the same function as g(x) = x + 1 
+   - So, you will need to work on `.equals` in your TypePrediction implementation. 
+
 ### Evaluation
 
 Types don't exist at run time: 
