@@ -53,7 +53,8 @@ Grammar constraints that we won't check but that can go wrong if you construct y
 - the variables mentioned in a class definitions are references to the parameter,
   meaning even inside of classes code must use `["this",field,"=",e]` and `["this", "dot-get", field]`
 - the names in a "class" type match those of the class
-- the name in an "instance" type matches a class name 
+- the name in an "instance" type matches a class name
+- `this` isn't special, so in principle you could assign to it and wipe it out; don't do it 
 
 ### Examples
 
@@ -93,7 +94,7 @@ We should be able to implement a class the encodes a list, but let's skip this f
 4. The `value` function needs to turn classes into "vtables" and
    it needs a meaning for objects.
    - a vtable tracks the "constructor" and the code for the methods
-   - an object meaning tracks the field value 
+   - the meaning of an object consists of the vtable and the field value 
 
 
 ### Question

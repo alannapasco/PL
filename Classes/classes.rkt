@@ -28,7 +28,8 @@ exec racket -tm "$0" -- ${1+"$@"}
 
 (define-type Meaning (U Boolean Integer Closure Object))
 [struct closure [{param : Symbol} {body : AST} {env : MEnv}] #:mutable #:type-name Closure]
-(struct object ([vtable : Symbol] [field : Meaning]) #:mutable #:type-name Object)
+(define-type VTable [List #;field-value AST #;para Symbol #;body AST])
+(struct object ([vtable : VTable] [field : Meaning]) #:mutable #:type-name Object)
 (define-type MEnv [Env (Boxof Meaning)])
 
 (: pipe (JSExpr -> JSExpr))
@@ -443,7 +444,6 @@ exec racket -tm "$0" -- ${1+"$@"}
 ;; a vtable environment 
 
 (define-type VEnv [Env VTable])
-(define-type VTable [List #;field-value AST #;para Symbol #;body AST])
 
 (: new-venv ([Listof C-AST] -> VEnv))
 (define (new-venv c*)
@@ -518,12 +518,13 @@ exec racket -tm "$0" -- ${1+"$@"}
        (value body (create-rec-env f x rhs env))]
 
       [`(new ,c)
-       (match-define `[,f ,_1 ,_2] (venv-retrieve vtables c))
-       (object c (value f (new-env)))]
+       (define vtable (venv-retrieve vtables c))
+       (match-define `[,f ,_1 ,_2] vtable)
+       (object vtable (value (first vtable) #;f (new-env)))]
       [`(cal ,o ,f ,a)
        (define oo (value o env))
        (define aa (value a env))
-       (match-define `[,_ ,p ,b] (venv-retrieve vtables  (object-vtable (ocast oo))))
+       (match-define `[,_ ,p ,b] (object-vtable (ocast oo)))
        (value b (env-add (env-add env p (box aa)) 'this (box oo)))]
       [`(set ,o ,f ,a)
        (define oo (ocast (value o env)))

@@ -38,7 +38,7 @@
 
 - TypeName is just a name. (If you're comfortable with Greek letters, use those for readability.)
 
-### Example:
+### Example
 
 Abstract the two `expt-` functions in the following 'program' into a
 single function and use it instead:  
