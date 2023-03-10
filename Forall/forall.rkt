@@ -221,7 +221,7 @@ exec racket -tm "$0" -- ${1+"$@"}
 
     [`(let ,t ,x ,rhs ,body) (compare b t (tc rhs env) "let var" (tc body (env-add env x t)))]
     [`(set ,x ,rhs) (compare b (env-retrieve env x "=") (tc rhs env) "set")]
-    [(? symbol? x) (env-retrieve env x "~a : undefined variable")]
+    [(? symbol? x) (env-retrieve env x "undefined variable")]
 
     [`(fun ,(and f-type `(-> ,p-type ,r-type)) ,f ,a ,rhs ,body)
      (define env+f (env-add env f f-type))
@@ -427,7 +427,7 @@ exec racket -tm "$0" -- ${1+"$@"}
        `["let" "tfun" [,(~a α)] ,result ,(~a f) [,paramt ,(~a x)] ,(translate r)
                "in" ,(translate h)]]
       [`(inst ,f ,t)
-       `["tcall" ,(~a f) ,(translate-type t)]]
+       `["tcall" ,(translate f) ,(translate-type t)]]
       [`(let ([,x : ,t ,rhs]) ,body)
        `["let" "var" ,(translate-type t) ,(~a x) "=" ,(translate rhs)
                "in" ,(translate body)]]
@@ -666,24 +666,37 @@ exec racket -tm "$0" -- ${1+"$@"}
   
   (translate/test
    (let ([start : Integer 42424242424242424])
-      ;; silly functions that should be baked in 
-      (letrec ([true? : (Boolean -> Boolean) (λ (x) x)])
-        (letrec ([not : (Boolean -> Boolean) (λ (x) (if x #false #true))])
-          (letrec ([zero? : (Integer -> Boolean) (λ (x) (= x 0))])
-            (letrec ([sub1 : (Integer -> Integer) (λ (x) (- x 1))])
-              ;; the 'repeated code'
-              (let ()
-                (: expt (∀ (α) ((α -> α) -> ((α -> Boolean) -> (α -> α)))))
-                (define (expt {exec : (α -> α)})
-                  (letrec ([expt-2 : ((α -> Boolean) -> (α -> α))
-                                   (λ (stop?)
-                                     (letrec ([expt-3 : (α -> α)
-                                                      (λ (x) 
-                                                        (repeat (begin0 x (set! x (exec x))) : α
-                                                                until (stop? x)))])
-                                       expt-3))])
-                    expt-2))
-                (|| 
-                 ((((inst expt Boolean) not) true?) #false)
-                 (< ((((inst expt Integer) sub1) zero?) 10) 11))))))))
-   "parametric function"))
+     ;; silly functions that should be baked in 
+     (letrec ([true? : (Boolean -> Boolean) (λ (x) x)])
+       (letrec ([not : (Boolean -> Boolean) (λ (x) (if x #false #true))])
+         (letrec ([zero? : (Integer -> Boolean) (λ (x) (= x 0))])
+           (letrec ([sub1 : (Integer -> Integer) (λ (x) (- x 1))])
+             ;; the 'repeated code'
+             (let ()
+               (: expt (∀ (α) ((α -> α) -> ((α -> Boolean) -> (α -> α)))))
+               (define (expt {exec : (α -> α)})
+                 (letrec ([expt-2 : ((α -> Boolean) -> (α -> α))
+                                  (λ (stop?)
+                                    (letrec ([expt-3 : (α -> α)
+                                                     (λ (x) 
+                                                       (repeat (begin0 x (set! x (exec x))) : α
+                                                               until (stop? x)))])
+                                      expt-3))])
+                   expt-2))
+               (|| 
+                ((((inst expt Boolean) not) true?) #false)
+                (< ((((inst expt Integer) sub1) zero?) 10) 11))))))))
+   "parametric function")
+  
+  (translate/test
+   (let ()
+     (: f (∀ (β) (β -> β)))
+     (define (f {g :  β}) g)
+     (let ()
+       (: g (∀ (α) (α -> α)))
+       (define (g {x : α}) x)
+       (let ([x : Integer 1])
+         (repeat (begin0 x (set! x [(inst (if (= x 0) f g) Integer) 0])) : Integer until (= x 0)))))
+
+   "parametric is first-class"))
+
