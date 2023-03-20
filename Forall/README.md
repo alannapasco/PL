@@ -97,11 +97,6 @@ _Solution_
   f is given the type (∀ α (at -> rt)) while type checking rhs and body (recursion!) 
   then the type of the entire expression is the type of body 
 
-- ["tcall", f, t]
-  if f must be of type (∀ α t1) (and α is not contained in t)
-  then the type of the entire expression is t1 with all α replaced by t
-  (Because of the constraint, this is non-trivial. Assume for now it's always true.)
-  
 ### Evaluation
 
 Types don't exist at run time: 

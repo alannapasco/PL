@@ -8,7 +8,7 @@ import pl.TypePrediction.TypeName;
 import pl.TypePrediction.VarType;
 
 import java.util.ArrayList;
-
+//test
 /**
 [ StackOverflow example:
  "let", "fun", "int", "f", ["int", "x"], "x", "in",
