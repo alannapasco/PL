@@ -46,7 +46,7 @@ public class ASTFun implements AST {
         //recursive environment
         IMeaning dummy = new IntegerRepresentation(0);
         IEnvironment<IMeaning> environmentWithPlaceholder = new Environment<>(this.funName, dummy, env);
-        IMeaning closure = new Closure(this.funBody, this.argName, environmentWithPlaceholder);
+        IMeaning closure = new Closure(this.funName, this.funBody, this.argName, environmentWithPlaceholder);
         environmentWithPlaceholder.update(this.funName, closure);
 
         //alternate option: make the closure recursive by

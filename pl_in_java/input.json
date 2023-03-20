@@ -230,5 +230,29 @@
 	[
 		"let","var","int","x","=",10, "in",
 			["repeat", ["set","x",["x","-",1]], "until", ["x","==",9]]
+	],
+	[
+		"let","var","int","x","=",5, "in",
+			["let","fun","int","setX",["int","newX"],["set","x","newX"], "in",
+				["let","fun","int","funAsArgExample",[["int","->","int"],"_"],["set","x",1], "in",
+					["call","funAsArgExample","setX"]]]
+	],
+	[
+		"let","var","int","x","=",5, "in",
+		["let","fun","int","setX",["int","newX"],["set","x","newX"], "in",
+			["let","fun","int","funAsArgExample",[["int","->","int"],"_"],["call","_",1], "in",
+				["call","funAsArgExample","setX"]]]
+	],
+	[
+		"let","tfun",["β"],"β","f",["β","g"],"g","in",
+			["let","var","int","x","=",1,"in",
+				["repeat",["set","x",["call",["tcall","f","int"],0]],"until",["x","==",0]]]
+	],
+	[
+		"let","tfun",["β"],"β","f",["β","g"],"g","in",
+			["let","tfun",["α"],"α","g",["α","x"],"x","in",
+				["let","var","int","x","=",1,"in",
+					["repeat",["set","x",["call",["tcall",["if",["x","==",0],"f","else","g"],"int"],0]],"until",["x","==",0]]]]
 	]
+
 ]

@@ -4,19 +4,22 @@ import pl.SymbolTable.*;
 
 //akaFunctionEvaluationDelayed
 public class Closure implements IMeaning {
+    public final String funName;
     private final AST funBody;
     private final String parameterName;
     private final IEnvironment<IMeaning> environment;
 
     //For testing purposes only
     public Closure(){
+        this.funName = null;
         this.funBody = null;
         this.parameterName = null;
         this.environment = null;
     }
 
     // "introduction" / "create"
-    public Closure(AST funBody, String parameter, IEnvironment<IMeaning> environment) {
+    public Closure(String funName, AST funBody, String parameter, IEnvironment<IMeaning> environment) {
+        this.funName = funName;
         this.funBody = funBody;
         this.parameterName = parameter;
         this.environment = environment;

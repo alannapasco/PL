@@ -7,41 +7,43 @@ import pl.TypePrediction.ArrowType;
 import pl.TypePrediction.Type;
 
 public class ASTFunCall implements AST {
-    String funName;
+    AST funExpression;
     AST funArg;
 
-    public ASTFunCall(String funName, AST funArg){
-        this.funName = funName;
+    public ASTFunCall(AST funName, AST funArg){
+        this.funExpression = funName;
         this.funArg = funArg;
     }
 
     @Override
     public Type typeCheck(IEnvironment<Type> env) throws Exception {
-        //Collect the info needed about the function being called
-        ArrowType arrow;
-        try {
-            arrow = (ArrowType) env.get(this.funName);
-        } catch (Exception e) {
-            throw new Exception("Type Error - function being called has not been defined properly");
+        Type funExpressionType = this.funExpression.typeCheck(env);
+        if (funExpressionType instanceof ArrowType fn) {
+            Type argType = fn.argType;
+            Type retType = fn.retType;
+            if (!argType.equals(this.funArg.typeCheck(env))){
+                throw new Exception("Type Error - given argument type'" + argType + "' is not the correct type as specified by " + this.funExpression + "'s function signature");
+            }
+            return retType;
+        } else {
+            throw new Exception("Type Error - func name " + this.funExpression + " does not resolve to an arrow type");
         }
-
-        //Check that the given argument is the correct type
-        if (!arrow.argType.equals(this.funArg.typeCheck(env))){
-            throw new Exception("Type Error - given argument type'" + arrow.argType + "' is not the correct type as specified by " + this.funName + "'s function signature");
-        }
-        return arrow.retType;
     }
 
     @Override
     public IMeaning value(IEnvironment<IMeaning> env) throws Exception {
-        Closure closure = (Closure) env.get(this.funName);
-        IMeaning argumentEvaluated = this.funArg.value(env);
-        return closure.execute(argumentEvaluated);
+        IMeaning funExpressionEvaluated = this.funExpression.value(env);
+        if (funExpressionEvaluated instanceof Closure c){
+            IMeaning argumentEvaluated = this.funArg.value(env);
+            return c.execute(argumentEvaluated);
+        } else {
+            throw new Exception("Invalid function Call - could not resolve: " + this.funExpression);
+        }
     }
 
     @Override
     public String toString(){
-        return "funCall: " + this.funName + "(" + funArg + ")";
+        return "funCall: " + this.funExpression + "(" + funArg + ")";
     }
 
     @Override
@@ -52,6 +54,6 @@ public class ASTFunCall implements AST {
         if (!(o instanceof ASTFunCall x)) {
             return false;
         }
-        return this.funName.equals(x.funName) && this.funArg.equals(x.funArg);
+        return this.funExpression.equals(x.funExpression) && this.funArg.equals(x.funArg);
     }
 }

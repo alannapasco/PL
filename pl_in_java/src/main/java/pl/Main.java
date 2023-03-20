@@ -4,6 +4,7 @@ import pl.AST.*;
 import pl.SymbolTable.MtEnvironment;
 import pl.TypePrediction.ArrowType;
 import pl.TypePrediction.Type;
+import pl.TypePrediction.TypeName;
 import pl.TypePrediction.VarType;
 
 import java.util.ArrayList;
@@ -111,9 +112,13 @@ public class Main {
                 return Main.parseVariableDeclaration(expression);
             } else if (what.equals("fun")) {
                 return Main.parseFunction(expression);
+            } else if (what.equals("tfun")) {
+                return Main.parseTFunction(expression);
             }
         } else if (action.equals("call")) {
             return Main.parseFunctionCall(expression);
+        } else if (action.equals("tcall")) {
+            return Main.parseTFunctionCall(expression);
         } else if (action.equals("set")) {
             return Main.parseVariableAssignment(expression);
         } else if (action.equals("repeat")) {
@@ -169,14 +174,54 @@ public class Main {
         return new ASTFun(returnTypeDetermined, funName, argTypeDetermined, argName, Main.parse(funVal), Main.parse(funScope));
     }
 
+    /**
+     * Parses a function<T> in JSONlang
+     */
+    private static AST parseTFunction(JsonArray expression){
+        String typeName = expression.get(2).getAsString();
+        JsonElement returnType = expression.get(3);
+        String funName = expression.get(4).getAsString();
+        JsonElement argType = expression.get(5).getAsJsonArray().get(0);
+        String argName = expression.get(5).getAsJsonArray().get(1).getAsString();
+        JsonElement funVal = expression.get(6);
+        JsonElement funScope = expression.get(8);
+
+        Type returnTypeDetermined;
+        Type argTypeDetermined;
+        try {
+            returnTypeDetermined = Main.determineTType(returnType);
+            argTypeDetermined = Main.determineTType(argType);
+        } catch (Exception e) {
+            return new ASTError(e.toString() + expression);
+        }
+        return new ASTFunT(returnTypeDetermined, funName, argTypeDetermined, argName, Main.parse(funVal), Main.parse(funScope));
+    }
+
 
     /**
      * Parses a function call in JSONlang
      */
     private static AST parseFunctionCall(JsonArray expression){
-        String funName = expression.get(1).getAsString();
+        JsonElement funName = expression.get(1);
         JsonElement funArg = expression.get(2);
-        return new ASTFunCall(funName, Main.parse(funArg));
+        return new ASTFunCall(Main.parse(funName), Main.parse(funArg));
+    }
+
+    /**
+     * Parses a function<T> call in JSONlang
+     */
+    private static AST parseTFunctionCall(JsonArray expression){
+        JsonElement funName = expression.get(1);
+        JsonElement ttype = expression.get(2);
+
+        Type typeDetermined;
+        try {
+            typeDetermined = Main.determineTType(ttype);
+        } catch (Exception e) {
+            return new ASTError(e.toString() + expression);
+        }
+
+        return new ASTFunTCall(Main.parse(funName), typeDetermined);
     }
 
     /**
@@ -237,7 +282,7 @@ public class Main {
 
 
     /**
-     * Determines the type of variable being declared or assigned in JSONland
+     * Determines the type of variable being declared or assigned in JSONlang
      */
     private static Type determineType(JsonElement input) {
         try {
@@ -248,6 +293,28 @@ public class Main {
                 return VarType.BOOLEAN;
             } else {
                 throw new Exception("Invalid Variable Assignment Type");
+            }
+        } catch (Exception e){
+            JsonArray arrowType = input.getAsJsonArray();
+            Type declared = determineType(arrowType.get(0));
+            Type returned = determineType(arrowType.get(2));
+            return new ArrowType(declared, returned);
+        }
+    }
+
+    /**
+     * Determines the type of variable being declared or assigned in JSONlang
+     * expression which includes generics
+     */
+    private static Type determineTType(JsonElement input) {
+        try {
+            String typeAsString = input.getAsString();
+            if (typeAsString.equals("int")) {
+                return VarType.INTEGER;
+            } else if (typeAsString.equals("bool")) {
+                return VarType.BOOLEAN;
+            } else {
+                return new TypeName(typeAsString);
             }
         } catch (Exception e){
             JsonArray arrowType = input.getAsJsonArray();

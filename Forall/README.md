@@ -18,12 +18,14 @@
    - ["repeat", FExp, "until", FExp] 
    - ["if", FExp, FExp, "else", FExp]   
 
-- revised syntax
+- revised syntax - revise parser 
    - ["call", FExp, FExp] 
 
 - new expressions:
    - ["let", "tfun", [TypeName], Type, Name, [Type, Name], FExp, "in", FExp]
    - ["tcall", FExp, Type]
+
+TypeName is <T> in java - is a parameter to a function
 
 - Type is one of:
    - "int"
@@ -38,9 +40,7 @@
 
 - TypeName is just a name. (If you're comfortable with Greek letters, use those for readability.)
 
-### Example
-
-_Problem_ 
+Examples:
 
 Abstract the two `expt-` functions in the following 'program' into a
 single function and use it instead:  
@@ -83,60 +83,34 @@ _Solution_
 
 ### Stages
 
-1. Parsing 1: Let's make function calls more flexible first: 
+1. Let's make function calls more flexible first: 
 
    - Modify the parser to accommodate the new `call` syntax first.
    - This will require a small change to the type checker and the `value` method. 
 
-2. Parsing 2: Then add the new expression forms and types to the parser. You will
+2. Then add the new expression forms and types to the parser. You will
    also need new AST variants and Type variants. 
-   
-3. Type Checking needs new rules for the new expressions. 
-   - The generalized function call syntax should already work as is. 
-
-4. Modify `value`. Turns out, this is a noop. 
-
-Details follow. 
-
-### Scope 
-
-- The scoping rules for the expression language don't change. 
-- The scoping rules for the type language are as expected. 
-
-In 
-```
-["let","tfun",["α"], rt, FName, [at, AName], rhs, "in", scope]
-```
-types may use "α" in `rt`, `at`, `rhs`, and `scope`. 
-
-
 
 ### Type Checking
 
-1. constraint that we won't check but that can go wrong if you construct your own examples: 
+- ["tfun", [α], rt, f, [at, x], rhs, "in", body]
+  f is given the type (∀ α (at -> rt)) while type checking rhs and body (recursion!) 
+  then the type of the entire expression is the type of body 
 
-   - a type that contains a name that is not _declared_ with a ∀, example: (∀ α β)
-
-2. the basic two rules: 
-
-   - ["tfun", [α], rt, f, [at, x], rhs, "in", body]
-   - `f` is given the type `(∀ α (at -> rt))` while type checking rhs and body (recursion!) 
-   - then the type of the entire expression is the type of body 
-
-   - ["tcall", f, t]
-   - `f` must be of type (∀ α t1) (and α is not contained in t)
-   - then the type of the entire expression is t1 with all α replaced by t
-   - (_Because of the constraint, this is non-trivial. Assume for now it's always true._)
-
+- ["tcall", f, t]
+  if f must be of type (∀ α t1) (and α is not contained in t)
+  then the type of the entire expression is t1 with all α replaced by t
+  (Because of the constraint, this is non-trivial. Assume for now it's always true.)
+  
 ### Evaluation
 
 Types don't exist at run time: 
 
-- `["tfun", [α], rt, f, [at, x], rhs, "in", body]`
-- ignores the types;
-- creates a recursive closure for `f(x) = rhs`
-- run body with `f` bound to that closure 
+- ["tfun", [α], rt, f, [at, x], rhs, "in", body]
+  ignoring the types;
+  create a recursive closure for `f(x) = rhs`
+  run body with f bound to that closure 
 
-- `["tcall", f, a]`
-- evaluates `f` and ignores `a` 
-
+- ["tcall", f, a]
+  call the closure on some whimsically chosen argument
+  Simply evaluate `f`

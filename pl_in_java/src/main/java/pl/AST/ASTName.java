@@ -6,7 +6,7 @@ import pl.TypePrediction.Type;
 
 
 public class ASTName implements AST {
-    String name;
+    public String name;
 
     public ASTName(String name) {
         this.name = name;
