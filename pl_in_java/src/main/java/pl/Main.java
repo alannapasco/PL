@@ -2,13 +2,10 @@ package pl;
 import com.google.gson.*;
 import pl.AST.*;
 import pl.SymbolTable.MtEnvironment;
-import pl.TypePrediction.ArrowType;
-import pl.TypePrediction.Type;
-import pl.TypePrediction.TypeName;
-import pl.TypePrediction.VarType;
+import pl.TypePrediction.*;
 
 import java.util.ArrayList;
-//test
+
 /**
 [ StackOverflow example:
  "let", "fun", "int", "f", ["int", "x"], "x", "in",
@@ -178,7 +175,7 @@ public class Main {
      * Parses a function<T> in JSONlang
      */
     private static AST parseTFunction(JsonArray expression){
-        String typeName = expression.get(2).getAsString();
+        JsonElement genericPlaceholder = expression.get(2);
         JsonElement returnType = expression.get(3);
         String funName = expression.get(4).getAsString();
         JsonElement argType = expression.get(5).getAsJsonArray().get(0);
@@ -186,15 +183,17 @@ public class Main {
         JsonElement funVal = expression.get(6);
         JsonElement funScope = expression.get(8);
 
+        GenericPlaceholder genericPlaceholderDetermined;
         Type returnTypeDetermined;
         Type argTypeDetermined;
         try {
+            genericPlaceholderDetermined = (GenericPlaceholder) Main.determineTType(genericPlaceholder);
             returnTypeDetermined = Main.determineTType(returnType);
             argTypeDetermined = Main.determineTType(argType);
         } catch (Exception e) {
             return new ASTError(e.toString() + expression);
         }
-        return new ASTFunT(returnTypeDetermined, funName, argTypeDetermined, argName, Main.parse(funVal), Main.parse(funScope));
+        return new ASTFun_T(genericPlaceholderDetermined, returnTypeDetermined, funName, argTypeDetermined, argName, Main.parse(funVal), Main.parse(funScope));
     }
 
 
@@ -212,16 +211,16 @@ public class Main {
      */
     private static AST parseTFunctionCall(JsonArray expression){
         JsonElement funName = expression.get(1);
-        JsonElement ttype = expression.get(2);
+        JsonElement genericActual = expression.get(2);
 
-        Type typeDetermined;
+        Type genericTypeDetermined;
         try {
-            typeDetermined = Main.determineTType(ttype);
+            genericTypeDetermined = Main.determineTType(genericActual);
         } catch (Exception e) {
             return new ASTError(e.toString() + expression);
         }
 
-        return new ASTFunTCall(Main.parse(funName), typeDetermined);
+        return new ASTFunCall_T(Main.parse(funName), genericTypeDetermined);
     }
 
     /**
@@ -288,9 +287,9 @@ public class Main {
         try {
             String typeAsString = input.getAsString();
             if (typeAsString.equals("int")) {
-                return VarType.INTEGER;
+                return new IntegerType();
             } else if (typeAsString.equals("bool")) {
-                return VarType.BOOLEAN;
+                return new BooleanType();
             } else {
                 throw new Exception("Invalid Variable Assignment Type");
             }
@@ -310,11 +309,11 @@ public class Main {
         try {
             String typeAsString = input.getAsString();
             if (typeAsString.equals("int")) {
-                return VarType.INTEGER;
+                return new IntegerType();
             } else if (typeAsString.equals("bool")) {
-                return VarType.BOOLEAN;
+                return new BooleanType();
             } else {
-                return new TypeName(typeAsString);
+                return new GenericPlaceholder(typeAsString);
             }
         } catch (Exception e){
             JsonArray arrowType = input.getAsJsonArray();

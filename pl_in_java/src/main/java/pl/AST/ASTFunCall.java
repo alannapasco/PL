@@ -18,6 +18,7 @@ public class ASTFunCall implements AST {
     @Override
     public Type typeCheck(IEnvironment<Type> env) throws Exception {
         Type funExpressionType = this.funExpression.typeCheck(env);
+
         if (funExpressionType instanceof ArrowType fn) {
             Type argType = fn.argType;
             Type retType = fn.retType;

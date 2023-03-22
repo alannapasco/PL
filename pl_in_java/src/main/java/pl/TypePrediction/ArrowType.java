@@ -1,8 +1,8 @@
 package pl.TypePrediction;
 
 public class ArrowType implements Type {
-    public final Type argType;
-    public final Type retType;
+    public Type argType;
+    public Type retType;
 
     public ArrowType(Type argType, Type retType){
         this.argType = argType;
@@ -10,8 +10,15 @@ public class ArrowType implements Type {
     }
 
     @Override
+    public Type substitute(GenericPlaceholder placeholder, Type actual) {
+        Type groundedArgType = this.argType.substitute(placeholder,actual);
+        Type groundedRetType =  this.retType.substitute(placeholder, actual);
+        return new ArrowType(groundedArgType, groundedRetType);
+    }
+
+    @Override
     public String toString(){
-        return "[ArrowType: " + argType + ", " + retType + "]";
+        return "[" + argType + "->" + retType + "]";
     }
 
     @Override

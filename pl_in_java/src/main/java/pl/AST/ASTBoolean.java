@@ -2,8 +2,8 @@ package pl.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.IEnvironment;
+import pl.TypePrediction.BooleanType;
 import pl.TypePrediction.Type;
-import pl.TypePrediction.VarType;
 
 public class ASTBoolean implements AST {
     final boolean value;
@@ -14,7 +14,7 @@ public class ASTBoolean implements AST {
 
     @Override
     public Type typeCheck(IEnvironment<Type> env) {
-        return VarType.BOOLEAN;
+        return new BooleanType();
     }
 
     @Override

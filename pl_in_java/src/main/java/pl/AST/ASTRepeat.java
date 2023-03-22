@@ -3,8 +3,8 @@ package pl.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.IEnvironment;
+import pl.TypePrediction.BooleanType;
 import pl.TypePrediction.Type;
-import pl.TypePrediction.VarType;
 
 public class ASTRepeat implements AST {
     final AST expression;
@@ -17,7 +17,7 @@ public class ASTRepeat implements AST {
 
     @Override
     public Type typeCheck(IEnvironment<Type> env) throws Exception {
-        if (!this.stoppingCondition.typeCheck(env).equals(VarType.BOOLEAN)) {
+        if (!(this.stoppingCondition.typeCheck(env) instanceof BooleanType)) {
             throw new Exception("Type Check - Stopping condition " + this.stoppingCondition + " is not a boolean");
         }
         return this.expression.typeCheck(env);

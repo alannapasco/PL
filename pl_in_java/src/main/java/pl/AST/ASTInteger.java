@@ -3,8 +3,8 @@ package pl.AST;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.IEnvironment;
+import pl.TypePrediction.IntegerType;
 import pl.TypePrediction.Type;
-import pl.TypePrediction.VarType;
 
 public class ASTInteger implements AST {
     private final int value;
@@ -15,7 +15,7 @@ public class ASTInteger implements AST {
 
     @Override
     public Type typeCheck(IEnvironment<Type> env) {
-        return VarType.INTEGER;
+        return new IntegerType();
     }
 
     @Override

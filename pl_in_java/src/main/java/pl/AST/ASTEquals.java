@@ -3,8 +3,8 @@ package pl.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.IEnvironment;
+import pl.TypePrediction.BooleanType;
 import pl.TypePrediction.Type;
-import pl.TypePrediction.VarType;
 
 public class ASTEquals implements AST {
     final AST firstVal;
@@ -19,7 +19,7 @@ public class ASTEquals implements AST {
     public Type typeCheck(IEnvironment<Type> env) throws Exception {
         //the first and second val do not need to be of the same type to call .equals() on them
         //in that case, .equals() will just return false
-        return VarType.BOOLEAN;
+        return new BooleanType();
     }
 
     @Override

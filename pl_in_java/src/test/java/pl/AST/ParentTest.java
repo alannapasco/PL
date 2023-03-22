@@ -2,7 +2,6 @@ package pl.AST;
 
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
-import pl.TypePrediction.VarType;
 
 public class ParentTest {
     final AST one;

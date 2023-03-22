@@ -1,7 +1,6 @@
 package pl.AST;
 
 import org.junit.Test;
-import pl.TypePrediction.VarType;
 
 import static org.junit.Assert.*;
 

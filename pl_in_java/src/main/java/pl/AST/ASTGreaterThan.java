@@ -4,8 +4,9 @@ import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.IEnvironment;
+import pl.TypePrediction.BooleanType;
+import pl.TypePrediction.IntegerType;
 import pl.TypePrediction.Type;
-import pl.TypePrediction.VarType;
 
 public class ASTGreaterThan implements AST {
     AST firstVal;
@@ -18,9 +19,9 @@ public class ASTGreaterThan implements AST {
 
     @Override
     public Type typeCheck(IEnvironment<Type> env) throws Exception {
-        if (this.firstVal.typeCheck(env)== VarType.INTEGER
-                && this.secondVal.typeCheck(env)== VarType.INTEGER) {
-            return VarType.BOOLEAN;
+        if (this.firstVal.typeCheck(env) instanceof IntegerType
+                && this.secondVal.typeCheck(env) instanceof IntegerType) {
+            return new BooleanType();
         } else {
             throw new Exception("Type Error - one of the AST around an GT expression is not an Integer");
         }

@@ -3,8 +3,9 @@ package pl.AST;
 import pl.Meaning.BooleanRepresentation;
 import pl.Meaning.IMeaning;
 import pl.SymbolTable.IEnvironment;
+import pl.TypePrediction.BooleanType;
+import pl.TypePrediction.IntegerType;
 import pl.TypePrediction.Type;
-import pl.TypePrediction.VarType;
 
 public class ASTAnd implements AST {
     final AST firstVal;
@@ -17,9 +18,9 @@ public class ASTAnd implements AST {
 
     @Override
     public Type typeCheck(IEnvironment<Type> env) throws Exception {
-        if (this.firstVal.typeCheck(env)== VarType.BOOLEAN
-                && this.secondVal.typeCheck(env)== VarType.BOOLEAN) {
-            return VarType.BOOLEAN;
+        if (this.firstVal.typeCheck(env)instanceof BooleanType
+                && this.secondVal.typeCheck(env)instanceof BooleanType) {
+            return new BooleanType();
         } else {
             throw new Exception("Type Error - one of the AST around an And expression is not a Boolean");
         }

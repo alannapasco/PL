@@ -3,8 +3,8 @@ package pl.AST;
 import pl.Meaning.IMeaning;
 import pl.Meaning.IntegerRepresentation;
 import pl.SymbolTable.IEnvironment;
+import pl.TypePrediction.IntegerType;
 import pl.TypePrediction.Type;
-import pl.TypePrediction.VarType;
 
 public class ASTSub implements AST {
     AST firstVal;
@@ -17,9 +17,9 @@ public class ASTSub implements AST {
 
     @Override
     public Type typeCheck(IEnvironment<Type> env) throws Exception {
-        if (this.firstVal.typeCheck(env)== VarType.INTEGER
-                && this.secondVal.typeCheck(env)== VarType.INTEGER) {
-            return VarType.INTEGER;
+        if (this.firstVal.typeCheck(env) instanceof IntegerType
+                && this.secondVal.typeCheck(env) instanceof IntegerType) {
+            return new IntegerType();
         } else {
             throw new Exception("Type Error - one of the AST around an Sub expression is not an Integer");
         }
